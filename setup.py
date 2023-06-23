@@ -9,9 +9,9 @@ setup(
     author_email="bruno.arine@runbox.com",
     packages=["findlike"],
     url="http://www.github.com/brunoarine/findlike",
-    license="LICENSE.txt",
+    license="LICENSE",
     description="findlike is a package to retrieve similar documents",
-    long_description=open("README.org").read(),
+    long_description=open("README.md").read(),
     package_data={'': ['*.txt', 'findlike/*.txt']},
     entry_points="""
         [console_scripts]
@@ -20,4 +20,5 @@ setup(
     include_package_data=True,
     install_requires=[
     ],
+    python_requires=">=3.8",
 )
