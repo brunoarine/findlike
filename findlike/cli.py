@@ -22,72 +22,19 @@ ALGORITHM_CLASSES = {"bm25": BM25, "tfidf": Tfidf}
 @click.version_option()
 @click.argument("reference-file", type=click.Path(), nargs=1, required=False)
 @click.option(
+    "-q",
+    "--query",
+    default=None,
+    show_default=True,
+    help="query option if no reference file is provided",
+)
+@click.option(
     "--directory",
     "-d",
     type=click.Path(),
     default=Path("."),
-    help="directory to scan for similar documents (default: current)",
-    required=False,
-)
-@click.option(
-    "-q",
-    "--query",
-    default=None,
-    help="query option if no reference file is provided",
-)
-@click.option(
-    "--algorithm",
-    "-a",
-    type=click.Choice(list(ALGORITHM_CLASSES.keys())),
-    default="tfidf",
-    help="algorithm for creating the bag of words (default: tfidf)",
-    required=False,
-)
-@click.option(
-    "--max-results",
-    "-m",
-    type=int,
-    default=10,
-    help="maximum number of results (default: 10)",
-    required=False,
-)
-@click.option(
-    "--language",
-    "-l",
-    type=str,
-    default="english",
-    help="stemmer and stopwords language (default: english)",
-    required=False,
-)
-@click.option(
-    "--min-words",
-    "-n",
-    type=int,
-    default=0,
-    help="minimum document size (in number of words) to be included in the corpus (default: 0)",
-    required=False,
-)
-@click.option(
-    "--prefix",
-    "-p",
-    type=str,
-    default="",
-    help="result lines prefix (default: None)",
-    required=False,
-)
-@click.option(
-    "--heading",
-    "-H",
-    type=str,
-    default="",
-    help="results list heading (default: None)",
-    required=False,
-)
-@click.option(
-    "--show-scores",
-    "-s",
-    is_flag=True,
-    help="show similarity scores (default: False)",
+    show_default="current directory",
+    help="directory to scan for similar documents",
     required=False,
 )
 @click.option(
@@ -95,6 +42,67 @@ ALGORITHM_CLASSES = {"bm25": BM25, "tfidf": Tfidf}
     "-R",
     is_flag=True,
     help="recursive search",
+    required=False,
+)
+@click.option(
+    "--algorithm",
+    "-a",
+    type=click.Choice(list(ALGORITHM_CLASSES.keys())),
+    default="tfidf",
+    show_default=True,
+    help="algorithm for creating the bag of words",
+    required=False,
+)
+@click.option(
+    "--language",
+    "-l",
+    type=str,
+    default="english",
+    show_default=True,
+    help="stemmer and stopwords language",
+    required=False,
+)
+@click.option(
+    "--min-words",
+    "-n",
+    type=int,
+    default=1,
+    show_default=True,
+    help="minimum document size (in number of words) to be included in the corpus",
+    required=False,
+)
+@click.option(
+    "--max-results",
+    "-m",
+    type=int,
+    default=10,
+    show_default=True,
+    help="maximum number of results",
+    required=False,
+)
+@click.option(
+    "--prefix",
+    "-p",
+    type=str,
+    default="",
+    show_default=True,
+    help="result lines prefix",
+    required=False,
+)
+@click.option(
+    "--heading",
+    "-H",
+    type=str,
+    default="",
+    show_default=True,
+    help="results list heading",
+    required=False,
+)
+@click.option(
+    "--show-scores",
+    "-s",
+    is_flag=True,
+    help="show similarity scores",
     required=False,
 )
 @click.option(
@@ -109,7 +117,9 @@ ALGORITHM_CLASSES = {"bm25": BM25, "tfidf": Tfidf}
     "-f",
     type=click.Choice(list(FORMATTER_CLASSES.keys())),
     default="plain",
-    help="output format (default: plain)",
+    show_default=True,
+    show_choices=True,
+    help="output format",
     required=False,
 )
 @click.option(
@@ -117,7 +127,8 @@ ALGORITHM_CLASSES = {"bm25": BM25, "tfidf": Tfidf}
     "-t",
     type=float,
     default=0.05,
-    help="minimum score for a result to be shown (default: 0.0)",
+    show_default=True,
+    help="minimum score for a result to be shown",
 )
 def cli(
     reference_file,
