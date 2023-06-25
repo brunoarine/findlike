@@ -92,8 +92,8 @@ class Corpus:
     ):
         self.min_words = min_words
 
-        self.documents_ = [read_file(p) for p in paths]
-        self.paths_ = paths
+        self.documents_: list[str] = [read_file(p) for p in paths]
+        self.paths_: list[Path] = paths
         if min_words:
             self._apply_filter()
 

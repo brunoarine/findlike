@@ -72,6 +72,13 @@ ALGORITHM_CLASSES = {"bm25": BM25, "tfidf": Tfidf}
     required=False,
 )
 @click.option(
+    "--absolute-paths",
+    "-A",
+    is_flag=True,
+    help="show absolute rather than relative paths",
+    required=False,
+)
+@click.option(
     "--max-results",
     "-m",
     type=int,
@@ -144,7 +151,8 @@ def cli(
     remove_first,
     query,
     format,
-    threshold
+    threshold,
+    absolute_paths
 ):
     """'findlike' is a program that scans a given directory and returns the most
     similar documents in relation to REFERENCE_FILE or --query QUERY."""
@@ -189,7 +197,7 @@ def cli(
     scores = model.get_scores(source=reference_content)
 
     # Format and print results.
-    format_config = dict(
+    formatter = FORMATTER_CLASSES[format](
         targets=corpus.paths_,
         scores=scores,
         num_results=max_results,
@@ -197,8 +205,8 @@ def cli(
         remove_first=remove_first,
         prefix=prefix,
         heading=heading,
-        threshold=threshold
-    )
-    formatter = FORMATTER_CLASSES[format](**format_config)
+        threshold=threshold,
+        absolute_paths=absolute_paths
+        )
     formatted_results = formatter.format()
     print(formatted_results)

@@ -40,6 +40,7 @@ class BaseFormatter:
         prefix: str,
         heading: str,
         threshold: float,
+        absolute_paths: bool
     ):
         self.targets = targets
         self.scores = scores
@@ -49,11 +50,17 @@ class BaseFormatter:
         self.prefix = prefix
         self.heading = heading
         self.threshold = threshold
-        self._filter_values()
+        self.absolute_paths = absolute_paths
 
-    def _filter_values(self):
-        # Remove the first element and limit to max number of results.
-        self._scores_targets = zip(self.scores, self.targets)
+        self._format_targets()
+        self._zip_pairs()
+        self._filter_pairs()
+    
+    def _zip_pairs(self):
+        self._scores_targets  = zip(self.scores, self.targets)
+    
+    def _filter_pairs(self):
+        """Remove the first element and limit to max number of results."""
         self._scores_targets = sorted(
             self._scores_targets, key=lambda x: x[0], reverse=True
         )
@@ -64,10 +71,16 @@ class BaseFormatter:
         self._scores_targets = [
             x for x in self._scores_targets if x[0] >= self.threshold
         ]
+    
+    def _format_targets(self):
+        if self.absolute_paths:
+            self.targets = [str(x.resolve()) for x in self.targets]
+        else:
+            self.targets = [str(x) for x in self.targets]
 
     def _format_score(self, score):
         return f"{score:.2f}" + " " if self.show_scores else ""
-
+    
     def format(self):
         if self.heading:
             print(self.heading)
