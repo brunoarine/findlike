@@ -88,24 +88,18 @@ class Corpus:
     def __init__(
         self,
         paths: List[Path],
-        min_words: int = 0,
+        min_chars: int,
     ):
-        self.min_words = min_words
+        self.min_chars = min_chars
 
         self.documents_: list[str] = [read_file(p) for p in paths]
         self.paths_: list[Path] = paths
-        if min_words:
+        if min_chars:
             self._apply_filter()
 
     def _apply_filter(self):
-        """Apply min words filter in both documents and documents paths"""
-        # stripped_docs = [
-        #     ORG_FILE_PROPERTY_LINE_RE.sub("", d) for d in self.documents_
-        # ]
-        stripped_docs = self.documents_
-        raw_tokens = [WORD_RE.findall(d) for d in stripped_docs]
-        tokens_count = np.array([len(t) for t in raw_tokens])
-        mask = (tokens_count > self.min_words).tolist()
+        """Apply min chars filter in both documents and documents paths"""
+        mask = [len(doc) >= self.min_chars for doc in self.documents_]
         self.documents_ = list(compress(self.documents_, mask))
         self.paths_ = list(compress(self.paths_, mask))
 

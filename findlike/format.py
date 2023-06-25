@@ -34,23 +34,25 @@ class BaseFormatter:
         self,
         targets: list[Path],
         scores: list[float],
-        num_results: int,
+        max_results: int,
         show_scores: bool,
-        remove_first: bool,
+        remove_reference: bool,
         prefix: str,
         heading: str,
         threshold: float,
-        absolute_paths: bool
+        absolute_paths: bool,
+        is_query: bool
     ):
         self.targets = targets
         self.scores = scores
-        self.num_results = num_results
+        self.max_results = max_results
         self.show_scores = show_scores
-        self.remove_first = remove_first
+        self.remove_reference = remove_reference
         self.prefix = prefix
         self.heading = heading
         self.threshold = threshold
         self.absolute_paths = absolute_paths
+        self.is_query = is_query
 
         self._format_targets()
         self._zip_pairs()
@@ -60,17 +62,24 @@ class BaseFormatter:
         self._scores_targets  = zip(self.scores, self.targets)
     
     def _filter_pairs(self):
-        """Remove the first element and limit to max number of results."""
+        """Remove reference doc if needed and limit list to max number of results."""
+
+        # Sort pairs according to distance (descending).
         self._scores_targets = sorted(
             self._scores_targets, key=lambda x: x[0], reverse=True
         )
-        range = slice(
-            int(self.remove_first), int(self.remove_first) + self.num_results
-        )
-        self._scores_targets = self._scores_targets[range]
+
+        # Remove entries whose score are below the threshold.
         self._scores_targets = [
             x for x in self._scores_targets if x[0] >= self.threshold
         ]
+
+        # Limit number of results, disregarding the first entry if `remove_reference`
+        # flag was passed.
+        start_pos = int(self.remove_reference and not self.is_query)
+        range = slice(start_pos, start_pos + self.max_results)
+        self._scores_targets = self._scores_targets[range]
+        
     
     def _format_targets(self):
         if self.absolute_paths:

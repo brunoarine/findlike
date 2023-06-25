@@ -63,12 +63,12 @@ ALGORITHM_CLASSES = {"bm25": BM25, "tfidf": Tfidf}
     required=False,
 )
 @click.option(
-    "--min-words",
-    "-n",
+    "--min-chars",
+    "-c",
     type=int,
     default=1,
     show_default=True,
-    help="minimum document size (in number of words) to be included in the corpus",
+    help="minimum document size (in number of characters) to be considered",
     required=False,
 )
 @click.option(
@@ -113,10 +113,10 @@ ALGORITHM_CLASSES = {"bm25": BM25, "tfidf": Tfidf}
     required=False,
 )
 @click.option(
-    "--remove-first",
+    "--remove-reference",
     "-F",
     is_flag=True,
-    help="remove first row from results",
+    help="remove REFERENCE_FILE from results",
     required=False,
 )
 @click.option(
@@ -143,12 +143,12 @@ def cli(
     algorithm,
     max_results,
     language,
-    min_words,
+    min_chars,
     prefix,
     heading,
     show_scores,
     recursive,
-    remove_first,
+    remove_reference,
     query,
     format,
     threshold,
@@ -176,7 +176,7 @@ def cli(
     documents_paths = [f for f in documents_glob]
 
     # Create a corpus with the collected documents.
-    corpus = Corpus(paths=documents_paths, min_words=min_words)
+    corpus = Corpus(paths=documents_paths, min_chars=min_chars)
 
     # Set up the documents pre-processor.
     stemmer = SnowballStemmer(language).stem
@@ -200,13 +200,14 @@ def cli(
     formatter = FORMATTER_CLASSES[format](
         targets=corpus.paths_,
         scores=scores,
-        num_results=max_results,
+        max_results=max_results,
         show_scores=show_scores,
-        remove_first=remove_first,
+        remove_reference=remove_reference,
         prefix=prefix,
         heading=heading,
         threshold=threshold,
-        absolute_paths=absolute_paths
+        absolute_paths=absolute_paths,
+        is_query=bool(query)
         )
     formatted_results = formatter.format()
     print(formatted_results)
