@@ -30,6 +30,12 @@ ALGORITHM_CLASSES = {"bm25": BM25, "tfidf": Tfidf}
     required=False,
 )
 @click.option(
+    "-q",
+    "--query",
+    default=None,
+    help="query option if no reference file is provided",
+)
+@click.option(
     "--algorithm",
     "-a",
     type=click.Choice(list(ALGORITHM_CLASSES.keys())),
@@ -97,12 +103,6 @@ ALGORITHM_CLASSES = {"bm25": BM25, "tfidf": Tfidf}
     is_flag=True,
     help="remove first row from results",
     required=False,
-)
-@click.option(
-    "-q",
-    "--query",
-    default=None,
-    help="query option if no reference file is provided",
 )
 @click.option(
     "--format",
