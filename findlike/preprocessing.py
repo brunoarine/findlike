@@ -1,20 +1,10 @@
-from typing import Callable
-from rank_bm25 import BM25Okapi
-import argparse
-import functools
-import os
 import re
-import sys
 from itertools import compress
 from pathlib import Path
 from typing import Callable, List
-import click
 
 import numpy as np
-from nltk.stem import SnowballStemmer, WordNetLemmatizer
-from scipy import sparse
-from sklearn.feature_extraction.text import TfidfVectorizer
-from sklearn.metrics.pairwise import cosine_similarity
+from nltk.stem import WordNetLemmatizer
 
 STOPWORDS_FILENAME = "stopwords.txt"
 JUNKCHARS_FILENAME = "junkchars.txt"
