@@ -101,7 +101,7 @@ ALGORITHM_CLASSES = {"bm25": BM25, "tfidf": Tfidf}
     "-q",
     "--query",
     default=None,
-    help="A query option if no reference file is provided",
+    help="query option if no reference file is provided",
 )
 @click.option(
     "--format",
@@ -110,6 +110,13 @@ ALGORITHM_CLASSES = {"bm25": BM25, "tfidf": Tfidf}
     default="plain",
     help="output format (default: plain)",
     required=False,
+)
+@click.option(
+    "--threshold",
+    "-t",
+    type=float,
+    default=0.05,
+    help="minimum score for a result to be shown (default: 0.0)",
 )
 def cli(
     reference_file,
@@ -125,6 +132,7 @@ def cli(
     remove_first,
     query,
     format,
+    threshold
 ):
     """'findlike' is a program that scans a given directory and returns the most
     similar documents in relation to REFERENCE_FILE or --query QUERY."""
@@ -177,6 +185,7 @@ def cli(
         remove_first=remove_first,
         prefix=prefix,
         heading=heading,
+        threshold=threshold
     )
     formatter = FORMATTER_CLASSES[format](**format_config)
     formatted_results = formatter.format()
