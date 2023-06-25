@@ -1,35 +1,8 @@
-from typing import Callable
-from rank_bm25 import BM25Okapi
-import argparse
-import functools
-import os
-import re
-import sys
-from itertools import compress
+import json
 from pathlib import Path
-from typing import Callable, List
-import click
-import orgparse
 
-import numpy as np
-from nltk.stem import SnowballStemmer, WordNetLemmatizer
-from scipy import sparse
-from sklearn.feature_extraction.text import TfidfVectorizer
-from sklearn.metrics.pairwise import cosine_similarity
 
-from .ioutils import get_relative_path
-
-def format_orgmode(
-    input_path: Path,
-    targets: List[Path],
-    scores: List[float],
-    num_results: int,
-    id_links: bool,
-    show_scores: bool,
-    remove_first: bool,
-    prefix: str = "",
-    heading: str = "",
-) -> List[str]:
+class BaseFormatter:
     """Format results in an org-compatible format with links.
 
     Args:
@@ -56,40 +29,58 @@ def format_orgmode(
         List of org formatted links to the most similar documents, sorted in descending
         order of similarity.
     """
-    results = zip(scores, targets)
-    sorted_results = sorted(results, key=lambda x: x[0], reverse=True)
-    valid_results = sorted_results[int(remove_first) : num_results + int(remove_first)]
-    formatted_results = []
-    print(heading)
-    print()
-    for score, target in valid_results:
-        org_content = orgparse.load(target)
-        title = org_content.get_file_property("title")
-        score_output = f"{score:.2f} " if show_scores else ""
-        if id_links:
-            target_id = org_content.get_property("ID")
-            link_ref = f"id:{target_id}"
-        else:
-            # org-mode links use relative rather than absolute paths
-            target_rel_path = get_relative_path(
-                source=input_path, target=target
-            )
-            link_ref = f"file:{target_rel_path}"
-        entry = f"{prefix}{score_output}[[{link_ref}][{title}]]"
-        formatted_results.append(entry)
-    return formatted_results
+
+    def __init__(
+        self,
+        targets: list[Path],
+        scores: list[float],
+        num_results: int,
+        show_scores: bool,
+        remove_first: bool,
+        prefix: str = "",
+        heading: str = "",
+    ):
+        self.targets = targets
+        self.scores = scores
+        self.num_results = num_results
+        self.show_scores = show_scores
+        self.remove_first = remove_first
+        self.prefix = prefix
+        self.heading = heading
+        self._filter_values()
+
+    def _filter_values(self):
+        # Remove the first element
+        self._scores_targets = zip(self.scores, self.targets)
+        self._scores_targets = sorted(
+            self._scores_targets, key=lambda x: x[0], reverse=True
+        )
+        range = slice(
+            int(self.remove_first), int(self.remove_first) + self.num_results
+        )
+        self._scores_targets = self._scores_targets[range]
+
+    def _format_score(self, score):
+        return f"{score:.2f}" + " " if self.show_scores else ""
+
+    def format(self):
+        if self.heading:
+            print(self.heading)
+        entries = [
+            f"{self.prefix}{self._format_score(score)}{target}"
+            for score, target in self._scores_targets
+        ]
+        output = "\n".join(entries)
+        return output
 
 
-def format_json(
-    input_path: Path,
-    targets: List[Path],
-    scores: List[float],
-    num_results: int,
-    id_links: bool,
-    show_scores: bool,
-    remove_first: bool,
-    prefix: str = "",
-    heading: str = "",
-) -> list[str]:
-    # TODO
-    return [""]
+class JsonFormatter(BaseFormatter):
+    def format(self):
+        if self.heading:
+            print(self.heading)
+        entries = [
+            {"score": score, "target": str(target)}
+            for score, target in self._scores_targets
+        ]
+        json_data = json.dumps(entries)
+        return json_data
