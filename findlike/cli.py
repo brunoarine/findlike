@@ -1,64 +1,47 @@
-from .format import BaseFormatter, JsonFormatter
-from rank_bm25 import BM25Okapi
-import functools
-import os
-import re
-import sys
-from itertools import compress
 from pathlib import Path
-from typing import Callable, List
-import click
 
-import numpy as np
-from nltk.stem import SnowballStemmer, WordNetLemmatizer
-from scipy import sparse
-from sklearn.feature_extraction.text import TfidfVectorizer
-from sklearn.metrics.pairwise import cosine_similarity
+import click
+from nltk.stem import SnowballStemmer
+
+from .format import BaseFormatter, JsonFormatter
 from .preprocessing import (
     Corpus,
+    Processor,
     get_junkchars,
     get_stopwords,
     read_file,
-    Processor,
 )
 from .wrappers import BM25, Tfidf
 
-FILES_EXT = "*.org"
-
+FILE_EXTENSIONS = ["*.org", "*.md", "*.txt", ".rst"]
 FORMATTER_CLASSES = {"plain": BaseFormatter, "json": JsonFormatter}
-
-WORD_RE = re.compile(r"(?u)\b[a-z]{2,}\b")
-URL_RE = re.compile(r"\S*https?:\S*")
+ALGORITHM_CLASSES = {"bm25": BM25, "tfidf": Tfidf}
 
 
 @click.command()
-@click.argument(
-    "reference",
-    type=click.Path(),
-    nargs=1
-)
+@click.argument("reference-file", type=click.Path(), nargs=1, required=False)
 @click.option(
     "--directory",
     "-d",
     type=click.Path(),
     default=Path("."),
-    help="directory to scan for similar documents",
+    help="directory to scan for similar documents (default: current)",
     required=False,
 )
 @click.option(
     "--algorithm",
     "-a",
-    type=str,
+    type=click.Choice(list(ALGORITHM_CLASSES.keys())),
     default="tfidf",
-    help="algorithm for creating the bag of words",
+    help="algorithm for creating the bag of words (default: tfidf)",
     required=False,
 )
 @click.option(
-    "--number",
-    "-n",
+    "--max-number",
+    "-m",
     type=int,
     default=10,
-    help="number of similar documents",
+    help="maximum number of results (default: 10)",
     required=False,
 )
 @click.option(
@@ -66,83 +49,108 @@ URL_RE = re.compile(r"\S*https?:\S*")
     "-l",
     type=str,
     default="english",
-    help="nltk's SnowBallStemmer language",
+    help="stemmer and stopwords language (default: english)",
     required=False,
 )
 @click.option(
     "--min-words",
-    "-m",
+    "-w",
     type=int,
     default=0,
-    help="minimum document size (in number of words) to be included in the corpus",
+    help="minimum document size (in number of words) to be included in the corpus (default: 0)",
     required=False,
 )
 @click.option(
-    "--prefix", "-p", type=str, default="", help="item prefix", required=False
+    "--prefix",
+    "-p",
+    type=str,
+    default="",
+    help="result lines prefix (default: None)",
+    required=False,
 )
 @click.option(
     "--heading",
     "-H",
     type=str,
     default="",
-    help="list heading",
+    help="results list heading (default: None)",
     required=False,
 )
 @click.option(
     "--show-scores",
     "-s",
     is_flag=True,
-    help="show cosine similarity scores (default: False)",
+    help="show similarity scores (default: False)",
     required=False,
 )
 @click.option(
     "--recursive",
-    "-r",
+    "-R",
     is_flag=True,
-    help="search for org files recursively (default: False)",
-    required=False,
-)
-@click.option(
-    "--id-links",
-    "-I",
-    is_flag=True,
-    help="create ID links instead of FILE links (default: False)",
+    help="recursive search",
     required=False,
 )
 @click.option(
     "--remove-first",
     "-F",
     is_flag=True,
-    help="remove first row from results (default: False)",
+    help="remove first row from results",
     required=False,
 )
-@click.option("--format", "-f", type=str, default="plain", required=False)
+@click.option(
+    "-q",
+    "--query",
+    default=None,
+    help="A query option if no reference file is provided",
+)
+@click.option(
+    "--format",
+    "-f",
+    type=click.Choice(list(FORMATTER_CLASSES.keys())),
+    default="plain",
+    help="output format (default: plain)",
+    required=False,
+)
 def cli(
-    reference,
+    reference_file,
     directory,
     algorithm,
-    number,
+    max_number,
     language,
     min_words,
     prefix,
     heading,
     show_scores,
     recursive,
-    id_links,
     remove_first,
+    query,
     format,
 ):
-    """Execute main function."""
-    target = Path(reference)
-    directory = Path(directory)
-    documents_glob = (
-        directory.rglob(FILES_EXT) if recursive else directory.glob(FILES_EXT)
-    )
+    """'findlike' is a program that scans a given directory and returns the most
+    similar documents in relation to REFERENCE_FILE or --query QUERY."""
 
+    # Set up the reference text.
+    if reference_file:
+        reference_content = read_file(Path(reference_file))
+    elif query:
+        reference_content = query
+    else:
+        raise click.UsageError(
+            "Neither REFERENCE_FILE nor --query QUERY was provided."
+        )
+
+    # Put together the list of documents to be analyzed.
+    directory_path = Path(directory)
+    glob_func = directory_path.rglob if recursive else directory_path.glob
+    documents_glob = [
+        file for extension in FILE_EXTENSIONS for file in glob_func(extension)
+    ]
     documents_paths = [f for f in documents_glob]
-    corpus = Corpus(paths=documents_paths, min_words=min_words)
-    source_content = read_file(target)
 
+    # Create a corpus with the collected documents.
+    corpus = Corpus(paths=documents_paths, min_words=min_words)
+
+    # Set up the documents pre-processor.
     stemmer = SnowballStemmer(language).stem
     junkchars = get_junkchars()
     stopwords = get_stopwords()
@@ -153,29 +161,23 @@ def cli(
         lemmatize=False,
     )
 
-    if algorithm == "bm25":
-        model = BM25(processor=processor)
-    else:
-        model = Tfidf(processor=processor)
+    # Set up the similarity model.
+    model = ALGORITHM_CLASSES[algorithm](processor=processor)
+    model.fit(
+        corpus.documents_ + [reference_content]
+    )  # Add reference to avoid zero division
+    scores = model.get_scores(source=reference_content)
 
-    # Add source content to list of possible words to avoid zero divisions.
-    model.fit(corpus.documents_ + [source_content])
-    scores = model.get_scores(source=source_content)
-
-    config = dict(
+    # Format and print results.
+    format_config = dict(
         targets=corpus.paths_,
         scores=scores,
-        num_results=number,
+        num_results=max_number,
         show_scores=show_scores,
-        id_links=id_links,
         remove_first=remove_first,
         prefix=prefix,
         heading=heading,
     )
-    selected_class = FORMATTER_CLASSES.get(format)
-    if selected_class:
-        formatter = selected_class(**config)
-    else:
-        raise ValueError("Invalid format type")
+    formatter = FORMATTER_CLASSES[format](**format_config)
     formatted_results = formatter.format()
     print(formatted_results)
