@@ -37,7 +37,7 @@ ALGORITHM_CLASSES = {"bm25": BM25, "tfidf": Tfidf}
     required=False,
 )
 @click.option(
-    "--max-number",
+    "--max-results",
     "-m",
     type=int,
     default=10,
@@ -54,7 +54,7 @@ ALGORITHM_CLASSES = {"bm25": BM25, "tfidf": Tfidf}
 )
 @click.option(
     "--min-words",
-    "-w",
+    "-n",
     type=int,
     default=0,
     help="minimum document size (in number of words) to be included in the corpus (default: 0)",
@@ -115,7 +115,7 @@ def cli(
     reference_file,
     directory,
     algorithm,
-    max_number,
+    max_results,
     language,
     min_words,
     prefix,
@@ -172,7 +172,7 @@ def cli(
     format_config = dict(
         targets=corpus.paths_,
         scores=scores,
-        num_results=max_number,
+        num_results=max_results,
         show_scores=show_scores,
         remove_first=remove_first,
         prefix=prefix,
