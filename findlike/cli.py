@@ -19,6 +19,7 @@ ALGORITHM_CLASSES = {"bm25": BM25, "tfidf": Tfidf}
 
 
 @click.command()
+@click.version_option()
 @click.argument("reference-file", type=click.Path(), nargs=1, required=False)
 @click.option(
     "--directory",
