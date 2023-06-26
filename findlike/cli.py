@@ -12,7 +12,6 @@ from .preprocessing import (
 )
 from .wrappers import BM25, Tfidf
 
-FILE_EXTENSIONS = ["*.org", "*.md", "*.txt", ".rst"]
 FORMATTER_CLASSES = {"plain": BaseFormatter, "json": JsonFormatter}
 ALGORITHM_CLASSES = {"bm25": BM25, "tfidf": Tfidf}
 
@@ -31,9 +30,17 @@ ALGORITHM_CLASSES = {"bm25": BM25, "tfidf": Tfidf}
     "--directory",
     "-d",
     type=click.Path(),
-    default=Path("."),
+    default=Path("./"),
     show_default="current directory",
-    help="directory to scan for similar documents",
+    help="directory to scan for similar files",
+    required=False,
+)
+@click.option(
+    "--filename-pattern",
+    "-f",
+    type=str,
+    default="*.*",
+    help="filename pattern matching",
     required=False,
 )
 @click.option(
@@ -96,6 +103,20 @@ ALGORITHM_CLASSES = {"bm25": BM25, "tfidf": Tfidf}
     required=False,
 )
 @click.option(
+    "--show-scores",
+    "-s",
+    is_flag=True,
+    help="show similarity scores",
+    required=False,
+)
+@click.option(
+    "--hide-reference",
+    "-h",
+    is_flag=True,
+    help="remove REFERENCE_FILE from results",
+    required=False,
+)
+@click.option(
     "--heading",
     "-H",
     type=str,
@@ -105,22 +126,8 @@ ALGORITHM_CLASSES = {"bm25": BM25, "tfidf": Tfidf}
     required=False,
 )
 @click.option(
-    "--show-scores",
-    "-s",
-    is_flag=True,
-    help="show similarity scores",
-    required=False,
-)
-@click.option(
-    "--remove-reference",
-    "-F",
-    is_flag=True,
-    help="remove REFERENCE_FILE from results",
-    required=False,
-)
-@click.option(
     "--format",
-    "-f",
+    "-F",
     type=click.Choice(list(FORMATTER_CLASSES.keys())),
     default="plain",
     show_default=True,
@@ -132,13 +139,14 @@ ALGORITHM_CLASSES = {"bm25": BM25, "tfidf": Tfidf}
     "--threshold",
     "-t",
     type=float,
-    default=0.05,
+    default=0.0,
     show_default=True,
     help="minimum score for a result to be shown",
 )
 def cli(
     reference_file,
     directory,
+    filename_pattern,
     algorithm,
     max_results,
     language,
@@ -147,7 +155,7 @@ def cli(
     heading,
     show_scores,
     recursive,
-    remove_reference,
+    hide_reference,
     query,
     format,
     threshold,
@@ -168,11 +176,8 @@ def cli(
 
     # Put together the list of documents to be analyzed.
     directory_path = Path(directory)
-    glob_func = directory_path.rglob if recursive else directory_path.glob
-    documents_glob = [
-        file for extension in FILE_EXTENSIONS for file in glob_func(extension)
-    ]
-    documents_paths = [f for f in documents_glob]
+    glob_func = directory_path.parent.rglob if recursive else directory_path.parent.glob
+    documents_paths = list(glob_func(filename_pattern))
 
     # Create a corpus with the collected documents.
     corpus = Corpus(paths=documents_paths, min_chars=min_chars)
@@ -198,7 +203,7 @@ def cli(
         scores=scores,
         max_results=max_results,
         show_scores=show_scores,
-        remove_reference=remove_reference,
+        hide_reference=hide_reference,
         prefix=prefix,
         heading=heading,
         threshold=threshold,

@@ -21,6 +21,7 @@ class BaseFormatter:
             Default is False.
         prefix (str): Prefix to add to each item in the printed list.
         heading (str): List heading (title).
+        hide_reference (bool): Omit the reference file from the final results.
         absolute_paths (bool): Show absolute paths instead of relative ones.
         is_query (bool): Flag whether the formatted results come from a query search.
 
@@ -35,7 +36,7 @@ class BaseFormatter:
         scores: list[float],
         max_results: int,
         show_scores: bool,
-        remove_reference: bool,
+        hide_reference: bool,
         prefix: str,
         heading: str,
         threshold: float,
@@ -46,7 +47,7 @@ class BaseFormatter:
         self.scores = scores
         self.max_results = max_results
         self.show_scores = show_scores
-        self.remove_reference = remove_reference
+        self.hide_reference = hide_reference
         self.prefix = prefix
         self.heading = heading
         self.threshold = threshold
@@ -74,7 +75,7 @@ class BaseFormatter:
 
         # Limit number of results, disregarding the first entry if `remove_reference`
         # flag was passed.
-        start_pos = int(self.remove_reference and not self.is_query)
+        start_pos = int(self.hide_reference and not self.is_query)
         range = slice(start_pos, start_pos + self.max_results)
         self._scores_targets = self._scores_targets[range]
 
