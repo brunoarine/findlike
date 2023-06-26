@@ -177,7 +177,8 @@ def cli(
     # Put together the list of documents to be analyzed.
     directory_path = Path(directory)
     glob_func = directory_path.parent.rglob if recursive else directory_path.parent.glob
-    documents_paths = list(glob_func(filename_pattern))
+    documents_paths = glob_func(filename_pattern)
+    documents_paths = [x for x in documents_paths if x.is_file()]
 
     # Create a corpus with the collected documents.
     corpus = Corpus(paths=documents_paths, min_chars=min_chars)

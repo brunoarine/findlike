@@ -2,7 +2,6 @@ import re
 from itertools import compress
 from pathlib import Path
 from typing import Callable, List
-
 from nltk.stem import WordNetLemmatizer
 
 WORD_RE = re.compile(r"(?u)\b[a-z]{2,}\b")
@@ -87,8 +86,10 @@ class Corpus:
     ):
         self.min_chars = min_chars
 
-        self.documents_: list[str] = [read_file(p) for p in paths]
-        self.paths_: list[Path] = paths
+        valid_documents: list[str|None] = [read_file(p) for p in paths]
+        self.documents_: list[str] = [x for x in valid_documents if x]
+        self.paths_: list[Path] = list(compress(paths, valid_documents))
+
         if min_chars:
             self._apply_filter()
 
@@ -97,9 +98,13 @@ class Corpus:
         mask = [len(doc) >= self.min_chars for doc in self.documents_]
         self.documents_ = list(compress(self.documents_, mask))
         self.paths_ = list(compress(self.paths_, mask))
+        return self
 
 
-def read_file(filename: Path) -> str:
+def read_file(filename: Path) -> str|None:
     with filename.open() as f:
-        document = f.read()
+        try:
+            document = f.read()
+        except UnicodeDecodeError:
+            document = None
     return document
