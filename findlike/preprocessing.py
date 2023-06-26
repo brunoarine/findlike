@@ -4,7 +4,6 @@ from pathlib import Path
 from typing import Callable, List
 
 from nltk.stem import WordNetLemmatizer
-from nltk.corpus import stopwords
 
 WORD_RE = re.compile(r"(?u)\b[a-z]{2,}\b")
 URL_RE = re.compile(r"\S*https?:\S*")
@@ -104,19 +103,3 @@ def read_file(filename: Path) -> str:
     with filename.open() as f:
         document = f.read()
     return document
-
-
-def get_stopwords() -> list:
-    """Get a list of stopwords from STOPWORDS file."""
-    with open(SCRIPT_PATH / STOPWORDS_FILENAME, "r") as f:
-        stopwords = f.read().split("\n")
-    return stopwords
-
-
-def get_junkchars() -> list:
-    """Get a list of junk characters from JUNKCHARS file."""
-    with open(SCRIPT_PATH / JUNKCHARS_FILENAME, "r") as f:
-        junkchars = f.read().split("\n")
-        # remove empty element, which will probably exist in the file
-        junkchars = [char for char in junkchars if char]
-    return junkchars
