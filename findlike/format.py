@@ -106,9 +106,14 @@ class JsonFormatter(BaseFormatter):
     def format(self):
         if self.heading:
             print(self.heading)
-        entries = [
-            {"score": score, "target": str(target)}
-            for score, target in self._scores_targets
-        ]
+        if self.show_scores:
+            entries = [
+                {"score": score, "target": str(target)}
+                for score, target in self._scores_targets
+            ]
+        else:
+            entries = [
+                {"target": str(target)} for _, target in self._scores_targets
+            ]
         json_data = json.dumps(entries)
         return json_data
