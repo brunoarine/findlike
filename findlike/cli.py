@@ -41,6 +41,7 @@ ALGORITHM_CLASSES = {"bm25": BM25, "tfidf": Tfidf}
     type=str,
     default="*.*",
     help="filename pattern matching",
+    show_default=True,
     required=False,
 )
 @click.option(
