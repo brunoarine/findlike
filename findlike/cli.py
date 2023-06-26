@@ -2,13 +2,12 @@ from pathlib import Path
 
 import click
 from nltk.stem import SnowballStemmer
+from stop_words import get_stop_words
 
 from .format import BaseFormatter, JsonFormatter
 from .preprocessing import (
     Corpus,
     Processor,
-    get_junkchars,
-    get_stopwords,
     read_file,
 )
 from .wrappers import BM25, Tfidf
@@ -180,11 +179,8 @@ def cli(
 
     # Set up the documents pre-processor.
     stemmer = SnowballStemmer(language).stem
-    junkchars = get_junkchars()
-    stopwords = get_stopwords()
     processor = Processor(
-        junkchars=junkchars,
-        stopwords=stopwords,
+        stopwords=get_stop_words(language=language),
         stemmer=stemmer,
         lemmatize=False,
     )

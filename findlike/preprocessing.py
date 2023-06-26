@@ -3,11 +3,9 @@ from itertools import compress
 from pathlib import Path
 from typing import Callable, List
 
-import numpy as np
 from nltk.stem import WordNetLemmatizer
+from nltk.corpus import stopwords
 
-STOPWORDS_FILENAME = "stopwords.txt"
-JUNKCHARS_FILENAME = "junkchars.txt"
 WORD_RE = re.compile(r"(?u)\b[a-z]{2,}\b")
 URL_RE = re.compile(r"\S*https?:\S*")
 
@@ -26,12 +24,10 @@ class Processor:
 
     def __init__(
         self,
-        junkchars: list[str],
         stopwords: list[str],
         stemmer: Callable,
         lemmatize=False,
     ):
-        self.junkchars = junkchars
         self.stopwords = stopwords
         self.stemmer = stemmer
         self.lemmatize = lemmatize
