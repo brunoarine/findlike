@@ -14,9 +14,6 @@ class BaseFormatter:
             documents in target_filenames plus one (accounting for the
             input_filename).
         num_results (int): How many similar entries to list at the end of the buffer.
-        id_links (bool): Whether the resulting list of similar documents will
-            point to ID property or filename. Recommend setting it to True
-            if you use `org-roam' v2.
         show_scores (bool): Whether to prepend the results with the similarity score.
         remove_first (bool): Remove first result from the scores list. Useful if
             the source document is inside the same directory as the target documents,
@@ -24,9 +21,11 @@ class BaseFormatter:
             Default is False.
         prefix (str): Prefix to add to each item in the printed list.
         heading (str): List heading (title).
+        absolute_paths (bool): Show absolute paths instead of relative ones.
+        is_query (bool): Flag whether the formatted results come from a query search.
 
     Returns:
-        List of org formatted links to the most similar documents, sorted in descending
+        Formatted output with the list of most similar documents, sorted in descending
         order of similarity.
     """
 
@@ -41,7 +40,7 @@ class BaseFormatter:
         heading: str,
         threshold: float,
         absolute_paths: bool,
-        is_query: bool
+        is_query: bool,
     ):
         self.targets = targets
         self.scores = scores
@@ -54,13 +53,12 @@ class BaseFormatter:
         self.absolute_paths = absolute_paths
         self.is_query = is_query
 
-        self._format_targets()
-        self._zip_pairs()
-        self._filter_pairs()
-    
+        self._format_targets()._zip_pairs()._filter_pairs()
+
     def _zip_pairs(self):
-        self._scores_targets  = zip(self.scores, self.targets)
-    
+        self._scores_targets = zip(self.scores, self.targets)
+        return self
+
     def _filter_pairs(self):
         """Remove reference doc if needed and limit list to max number of results."""
 
@@ -79,17 +77,19 @@ class BaseFormatter:
         start_pos = int(self.remove_reference and not self.is_query)
         range = slice(start_pos, start_pos + self.max_results)
         self._scores_targets = self._scores_targets[range]
-        
-    
+
+        return self
+
     def _format_targets(self):
         if self.absolute_paths:
             self.targets = [str(x.resolve()) for x in self.targets]
         else:
             self.targets = [str(x) for x in self.targets]
+        return self
 
     def _format_score(self, score):
         return f"{score:.2f}" + " " if self.show_scores else ""
-    
+
     def format(self):
         if self.heading:
             print(self.heading)
