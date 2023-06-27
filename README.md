@@ -3,7 +3,7 @@
 [![PyPI](https://img.shields.io/pypi/v/findlike.svg)](https://pypi.org/project/findlike/)
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](https://github.com/brunoarine/findlike/blob/master/LICENSE)
 
-`findlike` is a command-line tool that enables users to find similar documents in relation to a reference file or an ad-hoc query. This project is written in Python and utilizes well-known libraries that are optimized for performance.
+`findlike` is a command-line tool written in Python that retrieves a list of similar files in relation to a reference file or an ad-hoc query. The tool is highly configurable and can be used as backend for other programs (e.g. personal knowledge manage systems, Emacs, etc.) 
 
 Features: 
 
@@ -14,32 +14,41 @@ Features:
 
 ## Table of Contents
 
-- [Getting Started](#getting-started)
-  - [Prerequisites](#prerequisites)
-  - [Installation](#installation)
+- [Prerequisites](#prerequisites)
+- [Installation](#installation)
 - [Usage](#usage)
 - [Options](#options)
 - [Example](#examples)
 - [License](#license)
 
-## Getting Started
-
-These instructions will guide you through the process of installing and using `findlike` on your local machine.
-
-### Prerequisites
+## Prerequisites
 
 - Python 3.7 or higher
 - Additional dependencies as listed in the `requirements.txt` file
 
-### Installation
+## Installation
 
-To install `findlike`, follow the steps below:
+### Using `pip` (single user)
+
+To install `findlike` for your user only, run the following command in your terminal:
 
 ```bash
 pip install --user findlike
 ```
 
-If you prefer to download the repository instead:
+### Using `pip` and virtual environments
+
+Or, if you wish to install `findlike` in a new virtual environment, first create and activate the environment:
+
+```bash
+python -m venv <virtual environment directory>
+source <virtual environment directory>/bin/activate
+```
+
+Then run `pip install findlike` (without the `--user` flag).
+
+### Manual installation from source
+Lastly, if you prefer to install `findlike` from this repository instead of fetching the package from PyPI: 
 
 ```bash
 # Clone this repository
@@ -50,9 +59,19 @@ cd findlike
 
 # Install the required dependencies
 pip install -r requirements.txt
+```
 
-# Add an alias for the findlike command (Optional)
-echo "alias findlike='python /path/to/findlike/main.py'" >> ~/.bashrc
+Then you have two options, either you can install it as a Python package using `pip`:
+
+```bash
+pip install -e .
+```
+
+Or you can an alias for the `findlike` command:
+
+```bash
+# Replace .bashrc with .zshrc depending on your shell environment.
+echo "alias findlike='python /path/to/findlike/findlike/cli.py'" >> ~/.bashrc
 source ~/.bashrc
 ```
 
@@ -64,7 +83,7 @@ Here is the basic usage of findlike:
 findlike [OPTIONS] [REFERENCE_FILE]
 ```
 
-findlike will scan a given directory and return the most similar documents in relation to either a reference file or a query passed to with by the `--query` option.
+`findlike` works with either a reference file or a `--query` option. Once the reference text is set, `findlike` will scan a given directory (default is the current working dir), and return the most similar documents against the reference.
 
 ## Options
 
