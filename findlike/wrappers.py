@@ -1,19 +1,7 @@
 from rank_bm25 import BM25Okapi
-import argparse
-import functools
-import os
-import re
-import sys
-from itertools import compress
-from pathlib import Path
-from typing import Callable, List
-import click
-
-import numpy as np
-from nltk.stem import SnowballStemmer, WordNetLemmatizer
-from scipy import sparse
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
+
 
 class Tfidf:
     """Scikit-learn's TF-IDF wrapper.
@@ -36,7 +24,7 @@ class Tfidf:
             **kwargs,
         )
 
-    def fit(self, documents: List[str]):
+    def fit(self, documents: list[str]):
         self._vectorizer.fit(documents)
         self.documents_embeddings_ = self._vectorizer.transform(documents)
 
@@ -46,7 +34,6 @@ class Tfidf:
             self.source_embeddings_, self.documents_embeddings_
         ).flatten()
         return scores
-
 
 
 class BM25:
@@ -59,7 +46,7 @@ class BM25:
     def __init__(self, processor):
         self.processor = processor
 
-    def fit(self, documents: List[str]):
+    def fit(self, documents: list[str]):
         """Fit IDF to documents X"""
         clean_docs = [self.processor.preprocessor(d) for d in documents]
         tokenized_docs = [self.processor.tokenizer(d) for d in clean_docs]
@@ -70,5 +57,3 @@ class BM25:
         tokenized_source = self.processor.tokenizer(clean_source)
         scores = self._model.get_scores(tokenized_source)
         return scores
-
-
