@@ -57,7 +57,7 @@ ALGORITHM_CLASSES = {"bm25": BM25, "tfidf": Tfidf}
     type=click.Choice(list(ALGORITHM_CLASSES.keys())),
     default="tfidf",
     show_default=True,
-    help="algorithm for creating the bag of words",
+    help="text similarity algorithm",
     required=False,
 )
 @click.option(
@@ -163,7 +163,16 @@ def cli(
     absolute_paths
 ):
     """'findlike' is a program that scans a given directory and returns the most
-    similar documents in relation to REFERENCE_FILE or --query QUERY."""
+    similar documents in relation to REFERENCE_FILE or --query QUERY.
+    
+    Example using a reference file:
+
+    $ findlike -d /path/to/my/notes my_recipe.md
+
+    Example using a query:
+
+    $ findlike -q "There is only one good, knowledge, and one evil, ignorance"
+    """
 
     # Set up the reference text.
     if reference_file:
