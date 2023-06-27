@@ -1,2 +1,27 @@
+[project]
+name = "findlike"
+version = "0.1"
+authors = [{ name = "Bruno Arine", email = "bruno.arine@runbox.com" }]
+description = "findlike is a package to retrieve similar documents"
+readme = "README.md"
+requires-python = ">=3.7"
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent"
+]
+
+[project.urls]
+"Homepage" = "http://www.github.com/brunoarine/findlike"
+"Repository" = "https://github.com/brunoarine/findlike.git"
+"Bug Tracker" = "http://www.github.com/brunoarine/findlike/issues"
+
+[project.scripts]
+findlike = "findlike.cli:cli"
+
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
 [tool.black]
 line-length = 79
