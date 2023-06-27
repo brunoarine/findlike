@@ -34,14 +34,14 @@ class BaseFormatter:
         self,
         targets: list[Path],
         scores: list[float],
-        max_results: int,
-        show_scores: bool,
-        hide_reference: bool,
-        prefix: str,
-        heading: str,
-        threshold: float,
-        absolute_paths: bool,
-        is_query: bool,
+        max_results: int = 10,
+        show_scores: bool = False,
+        hide_reference: bool = False,
+        prefix: str = "",
+        heading: str = "",
+        threshold: float = 0.0,
+        absolute_paths: bool = False,
+        is_query: bool = False,
     ):
         self.targets = targets
         self.scores = scores
@@ -92,9 +92,10 @@ class BaseFormatter:
         return f"{score:.2f}" + " " if self.show_scores else ""
 
     def format(self):
+        entries = []
         if self.heading:
-            print(self.heading)
-        entries = [
+            entries.append(self.heading)
+        entries += [
             f"{self.prefix}{self._format_score(score)}{target}"
             for score, target in self._scores_targets
         ]
