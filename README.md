@@ -1,5 +1,8 @@
 # findlike
 
+[![PyPI](https://img.shields.io/pypi/v/findlike.svg)](https://pypi.org/project/findlike/)
+[![License](https://img.shields.io/badge/license-MIT-blue.svg)](https://github.com/brunoarine/findlike/blob/master/LICENSE)
+
 `findlike` is a command-line tool that enables users to find similar documents in relation to a reference file or an ad-hoc query. This project is written in Python and utilizes well-known libraries that are optimized for performance.
 
 Features: 
