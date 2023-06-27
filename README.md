@@ -19,10 +19,8 @@ Features:
   - [Installation](#installation)
 - [Usage](#usage)
 - [Options](#options)
-- [Example](#example)
-- [Contributing](#contributing)
+- [Example](#examples)
 - [License](#license)
-- [Acknowledgments](#acknowledgments)
 
 ## Getting Started
 
