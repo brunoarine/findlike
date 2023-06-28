@@ -5,10 +5,10 @@ from nltk.stem import SnowballStemmer
 from stop_words import get_stop_words
 
 from .format import BaseFormatter, JsonFormatter
+from .utils import try_read_file
 from .preprocessing import (
     Corpus,
     Processor,
-    read_file,
 )
 from .wrappers import BM25, Tfidf
 
@@ -164,7 +164,7 @@ def cli(
 ):
     """'findlike' is a program that scans a given directory and returns the most
     similar documents in relation to REFERENCE_FILE or --query QUERY.
-    
+
     Example using a reference file:
 
     $ findlike -d /path/to/my/notes my_recipe.md
@@ -176,7 +176,7 @@ def cli(
 
     # Set up the reference text.
     if reference_file:
-        reference_content = read_file(Path(reference_file))
+        reference_content = try_read_file(Path(reference_file))
     elif query:
         reference_content = query
     else:
