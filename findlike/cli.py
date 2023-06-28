@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from pathlib import Path
 
 import click
@@ -5,11 +7,11 @@ from nltk.stem import SnowballStemmer
 from stop_words import get_stop_words
 
 from .format import BaseFormatter, JsonFormatter
-from .utils import try_read_file
 from .preprocessing import (
     Corpus,
     Processor,
 )
+from .utils import try_read_file
 from .wrappers import BM25, Tfidf
 
 FORMATTER_CLASSES = {"plain": BaseFormatter, "json": JsonFormatter}
