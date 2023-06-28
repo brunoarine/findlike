@@ -8,7 +8,7 @@ from stop_words import get_stop_words
 def processor():
     stemmer = SnowballStemmer("english").stem
     return Processor(
-        stopwords=get_stop_words("english"), stemmer=stemmer, lemmatize=True
+        stopwords=get_stop_words("english"), stemmer=stemmer
     )
 
 
@@ -22,12 +22,6 @@ def test_tokenize(processor):
     text = "This is a test."
     tokens = processor._tokenize(text)
     assert tokens == ["This", "is", "test"]
-
-
-def test_lemmatize(processor):
-    tokens = ["cats", "are", "running"]
-    lemmatized_tokens = processor._lemmatize(tokens)
-    assert lemmatized_tokens == ["cat", "are", "running"]
 
 
 def test_stemmize(processor):
@@ -73,13 +67,6 @@ def test_text_with_numbers(processor):
     text = "There are 100 cats"
     tokens = processor.tokenizer(processor.preprocessor(text))
     assert tokens == ["100", "cat"]
-
-
-def test_text_without_lemmatization(processor):
-    processor.lemmatize = False
-    text = "Cats are running"
-    tokens = processor.tokenizer(processor.preprocessor(text))
-    assert tokens == ["cat", "run"]
 
 
 def test_text_with_unicode_characters(processor):

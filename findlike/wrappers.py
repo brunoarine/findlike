@@ -10,10 +10,6 @@ class Tfidf:
 
     Args:
         processor (Processor): Processor object.
-        b (float): Free parameter. Default is 0.75.
-        k1 (float): Free parameter. Recommended value is between 1.2 and 2.0.
-        normalize (bool): Divide the results by the maximum value so it sits
-            in the range between 0 and 1.
     """
 
     def __init__(self, processor, **kwargs):

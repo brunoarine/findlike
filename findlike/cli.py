@@ -203,7 +203,6 @@ def cli(
     processor = Processor(
         stopwords=get_stop_words(language=language),
         stemmer=stemmer,
-        lemmatize=False,
     )
 
     # Set up the similarity model.

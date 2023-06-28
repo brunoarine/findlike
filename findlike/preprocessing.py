@@ -4,8 +4,6 @@ import re
 from pathlib import Path
 from typing import Callable
 
-from nltk.stem import WordNetLemmatizer
-
 from .utils import try_read_file, compress
 
 WORD_RE = re.compile(r"(?u)\b\w{2,}\b")
@@ -21,19 +19,15 @@ class Processor:
         junkchars (list): List of junk characters to be stripped from the text.
         stopwords (list): List of stopwords to be removed from the text.
         stemmer (nltk's stemmer): Stemmer provided by the nltk API.
-        lemmatize (bool): Whether to lemmatize tokens.
     """
 
     def __init__(
         self,
         stopwords: list[str],
         stemmer: Callable,
-        lemmatize=False,
     ):
         self.stopwords = stopwords
         self.stemmer = stemmer
-        self.lemmatize = lemmatize
-        self._lemmatizer = WordNetLemmatizer() if self.lemmatize else None
         self._stopwords_re = re.compile(
             r"\b(" + r"|".join(stopwords) + r")\b\s*"
         )
@@ -51,7 +45,6 @@ class Processor:
         This method should be called by the similarity algorithms.
         """
         tokens = self._tokenize(text)
-        tokens = self._lemmatize(tokens) if self.lemmatize else tokens
         tokens = self._stemmize(tokens)
         return tokens
 
@@ -61,9 +54,6 @@ class Processor:
         """
         words = WORD_RE.findall(text)
         return words
-
-    def _lemmatize(self, tokens: list[str]) -> list[str]:
-        return [self._lemmatizer.lemmatize(w) for w in tokens]
 
     def _stemmize(self, tokens: list[str]) -> list[str]:
         """Get only the stems from a list of words."""
