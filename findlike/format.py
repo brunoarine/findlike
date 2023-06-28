@@ -54,10 +54,11 @@ class BaseFormatter:
         self.absolute_paths = absolute_paths
         self.is_query = is_query
 
+        self._scores_targets: list[tuple[float, Path]]
         self._format_targets()._zip_pairs()._filter_pairs()
 
     def _zip_pairs(self):
-        self._scores_targets = zip(self.scores, self.targets)
+        self._scores_targets = list(zip(self.scores, self.targets))
         return self
 
     def _filter_pairs(self):
@@ -83,9 +84,7 @@ class BaseFormatter:
 
     def _format_targets(self):
         if self.absolute_paths:
-            self.targets = [str(x.resolve()) for x in self.targets]
-        else:
-            self.targets = [str(x) for x in self.targets]
+            self.targets = [x.resolve() for x in self.targets]
         return self
 
     def _format_score(self, score):
