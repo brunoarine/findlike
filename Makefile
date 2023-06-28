@@ -2,7 +2,7 @@
 
 build:
 	@echo "Building Python package..."
-	python build
+	python -m build
 	@echo "Uploading to PyPI..."
 	python -m twine upload dist/*
 
