@@ -1,6 +1,6 @@
 [project]
 name = "findlike"
-version = "1.0.0"
+version = "1.1.0"
 authors = [{ name = "Bruno Arine", email = "bruno.arine@runbox.com" }]
 description = "findlike is a package to retrieve similar documents"
 readme = "README.md"
