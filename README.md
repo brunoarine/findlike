@@ -10,7 +10,8 @@ Features:
 
 - Choose between BM25 and TF-IDF + cosine distance for similarity calculation
 - Recursive search option
-- Control over output format, document size to consider, maximum results to show, etc.
+- Control over parameters like maximum number of results, whether to display similarity scores etc.
+- Optionally return results in JSON format
 - Multilingual support
 
 ## Table of Contents
@@ -58,21 +59,16 @@ git clone https://github.com/brunoarine/findlike.git
 # Navigate into the findlike directory
 cd findlike
 
-# Install the required dependencies
-pip install -r requirements.txt
-```
+# Install it as a Python package using `pip`:
 
-Then you have two options, either you can install it as a Python package using `pip`:
-
-```bash
 pip install -e .
 ```
 
-Or you can an alias for the `findlike` command:
+Optionally, you can create an alias for the `findlike` command to be accessible without activating its virtual environment:
 
 ```bash
 # Replace .bashrc with .zshrc depending on your shell environment.
-echo "alias findlike='python /path/to/findlike/findlike/cli.py'" >> ~/.bashrc
+echo "alias findlike='/path/to/findlike/venv/bin/findlike'" >> ~/.bashrc
 source ~/.bashrc
 ```
 
