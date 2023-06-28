@@ -1,8 +1,10 @@
 import re
-from itertools import compress
 from pathlib import Path
-from typing import Callable, List
+from typing import Callable
+
 from nltk.stem import WordNetLemmatizer
+
+from .utils import try_read_file, compress
 
 WORD_RE = re.compile(r"(?u)\b\w{2,}\b")
 URL_RE = re.compile(r"\S*https?:\S*")
@@ -42,69 +44,75 @@ class Processor:
         text = URL_RE.sub("", text)
         return text
 
-    def _tokenize(self, text: str) -> List[str]:
-        """Preprocess a text and returns a list of tokens."""
-        words = WORD_RE.findall(text)
-        return words
-
-    def _lemmatize(self, tokens: List[str]) -> List[str]:
-        return [self._lemmatizer.lemmatize(w) for w in tokens]
-
-    def _stemmize(self, tokens: List[str]) -> List[str]:
-        """Get only the stems from a list of words."""
-        return [self.stemmer(w) for w in tokens]
-
-    def tokenizer(self, text: str) -> List[str]:
-        """Run the preprocessor."""
-
+    def tokenizer(self, text: str) -> list[str]:
+        """Run the tokenization and post-processing.
+        This method should be called by the similarity algorithms.
+        """
         tokens = self._tokenize(text)
         tokens = self._lemmatize(tokens) if self.lemmatize else tokens
         tokens = self._stemmize(tokens)
         return tokens
+
+    def _tokenize(self, text: str) -> list[str]:
+        """Preprocess a text and returns a list of tokens.
+        This method should be called by the similarity algorithms.
+        """
+        words = WORD_RE.findall(text)
+        return words
+
+    def _lemmatize(self, tokens: list[str]) -> list[str]:
+        return [self._lemmatizer.lemmatize(w) for w in tokens]
+
+    def _stemmize(self, tokens: list[str]) -> list[str]:
+        """Get only the stems from a list of words."""
+        return [self.stemmer(w) for w in tokens]
 
 
 class Corpus:
     """This wrapper provides easy access to a filtered corpus.
 
     Args:
-        paths (list of Path): Documents paths.
-        min_words (int): Minimum document size (in number of words) to include
-            in the corpus. This number takes into account the number of words
-            in the document bodies only, and doesn't include any kind of file
-            properties (not even #+TITLE).
-
+        paths (list of Path): Document paths.
+        min_chars (int): Minimum document size (in number of chars) to include
+            in the corpus.
     Properties:
-        documents_ (list of str): List of (un)filtered documents contents.
-        paths_ (list of Path): List of (un)filtered document paths.
+        documents_ (list of str): List of filtered document contents.
+        paths_ (list of Path): List of filtered document paths.
 
     """
 
     def __init__(
         self,
-        paths: List[Path],
+        paths: list[Path],
         min_chars: int,
     ):
+        self.paths = paths
         self.min_chars = min_chars
 
-        valid_documents: list[str|None] = [read_file(p) for p in paths]
-        self.documents_: list[str] = [x for x in valid_documents if x]
-        self.paths_: list[Path] = list(compress(paths, valid_documents))
+        self._loaded_documents: list[str | None]
 
+        self.documents_: list[str]
+        self.paths_: list[Path]
+
+        self._load_documents()
         if min_chars:
-            self._apply_filter()
+            self._apply_min_chars_filter()
+        self._prune_documents()
+        self._prune_paths()
 
-    def _apply_filter(self):
+    def _load_documents(self):
+        self._loaded_documents = [try_read_file(p) for p in self.paths]
+
+    def _prune_paths(self):
+        self.paths_ = compress(self.paths, self.documents_)
+
+    def _prune_documents(self):
+        self.documents_ = [x for x in self._loaded_documents if x]
+
+    def _apply_min_chars_filter(self):
         """Apply min chars filter in both documents and documents paths"""
-        mask = [len(doc) >= self.min_chars for doc in self.documents_]
-        self.documents_ = list(compress(self.documents_, mask))
-        self.paths_ = list(compress(self.paths_, mask))
+        self._loaded_documents = [
+            doc if doc and len(doc) >= self.min_chars else None
+            for doc in self._loaded_documents
+        ]
         return self
-
-
-def read_file(filename: Path) -> str|None:
-    with filename.open() as f:
-        try:
-            document = f.read()
-        except UnicodeDecodeError:
-            document = None
-    return document
