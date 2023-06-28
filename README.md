@@ -2,6 +2,7 @@
 
 [![PyPI](https://img.shields.io/pypi/v/findlike.svg)](https://pypi.org/project/findlike/)
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](https://github.com/brunoarine/findlike/blob/master/LICENSE)
+[![Tests](https://github.com/brunoarine/findlike/workflows/Test/badge.svg)](https://github.com/brunoarine/findlike/actions?query=workflow%3ATest)
 
 `findlike` is a command-line tool written in Python that retrieves a list of similar files in relation to a reference file or an ad-hoc query. The tool is highly configurable and can be used as backend for other programs (e.g. personal knowledge manage systems, Emacs, etc.) 
 
@@ -23,7 +24,7 @@ Features:
 
 ## Prerequisites
 
-- Python 3.7 or higher
+- Python 3.8 or higher
 - Additional dependencies as listed in the `requirements.txt` file
 
 ## Installation
