@@ -4,7 +4,7 @@ from pathlib import Path
 from typing import Callable, List
 from nltk.stem import WordNetLemmatizer
 
-WORD_RE = re.compile(r"(?u)\b[a-z]{2,}\b")
+WORD_RE = re.compile(r"(?u)\b\w{2,}\b")
 URL_RE = re.compile(r"\S*https?:\S*")
 
 SCRIPT_PATH = Path(__file__).parent
