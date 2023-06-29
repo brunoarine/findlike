@@ -123,6 +123,14 @@ If used, this option makes `findlike` scans directories and their sub-directorie
 findlike reference_file.txt -R
 ```
 
+#### `-a, --algorithm [tfidf|bm25]`
+
+Algorithm to use when generating the scores list. The possible choices are `tfidf` or `bm25'. Default is `tfidf`, and it works great in most cases. However, `bm25' may be a bit more robust in depending on the size of your documents. Example:
+
+```sh
+findlike reference_file -a bm25
+```
+
 #### `-l, --language TEXT`
 
 Changing this value will impact stopwords filtering and word stemmer. The following languages are supported: Arabic, Danish, Dutch, English, Finnish, French, German, Hungarian, Italian, Norwegian, Portuguese, Romanian, Russian, Spanish and Swedish. Default is English.
@@ -235,11 +243,11 @@ Now install the development dependencies:
 
 ```sh
 pip install -e '.[dev]'
-`` 
+```
 
 To run the tests:
 
-```bash
+```sh
 pytest
 ```
 
