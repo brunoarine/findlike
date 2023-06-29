@@ -85,33 +85,117 @@ findlike [OPTIONS] [REFERENCE_FILE]
 
 ## Options
 
-Here's the breakdown of the available options in Findlike:
+Here's the breakdown of the available options in findlike:
 
-```
-  --version                     Show the version and exit.
-  -q, --query TEXT              query option if no reference file is provided
-  -d, --directory PATH          directory to scan for similar files  [default:
-                                (current directory)]
-  -f, --filename-pattern TEXT   filename pattern matching  [default: *.*]
-  -R, --recursive               recursive search
-  -a, --algorithm [bm25|tfidf]  text similarity algorithm  [default: tfidf]
-  -l, --language TEXT           stemmer and stopwords language  [default:
-                                english]
-  -c, --min-chars INTEGER       minimum document size (in number of
-                                characters) to be considered  [default: 1]
-  -A, --absolute-paths          show absolute rather than relative paths
-  -m, --max-results INTEGER     maximum number of results  [default: 10]
-  -p, --prefix TEXT             result lines prefix
-  -s, --show-scores             show similarity scores
-  -h, --hide-reference          remove REFERENCE_FILE from results
-  -H, --heading TEXT            results list heading
-  -F, --format [plain|json]     output format  [default: plain]
-  -t, --threshold FLOAT         minimum score for a result to be shown
-                                [default: 0.0]
-  --help                        Show this message and exit.
+#### `--help`
+
+Displays a short summary of the available options.
+
+#### `-d, --directory PATH`
+
+Specify the directory that is going to be scanned. Default is current working directory. Example:
+
+```sh
+findlike -d /path/to/another/directory
 ```
 
-## Examples
+#### `-q, --query TEXT`
+
+Passes an ad-hoc query to the program, so that no reference file is required. Useful when you want to quickly find documents by an overall theme. Example:
+
+```sh
+findlike -q "earthquakes"
+```
+
+#### `-f, --file-pattern`
+
+Specifies the file pattern to use when scanning the directories for similar files. The pattern uses [glob](https://en.wikipedia.org/wiki/Glob_(programming)) convention, and should be passed with single or double quotes, otherwise your shell environment will likely try to expand it. Default is common plain-text file extensions (the full list can be seen [here](./findlike/constants.py)).
+
+```sh
+findlike -f "*.md" reference_file.txt
+```
+
+#### `-R, --recursive`
+
+If used, this option makes `findlike` scans directories and their sub-directories as well. Example:
+
+```sh
+findlike reference_file.txt -R
+```
+
+#### `-l, --language TEXT`
+
+Changing this value will impact stopwords filtering and word stemmer. The following languages are supported: Arabic, Danish, Dutch, English, Finnish, French, German, Hungarian, Italian, Norwegian, Portuguese, Romanian, Russian, Spanish and Swedish. Default is English.
+
+```sh
+findlike reference_file.txt -l "portuguese"
+```
+
+#### `-c, --min-chars INTEGER`
+
+Minimum document size (in number of characters) to be included in the corpus. Default is 1. Example:
+
+```sh
+findlike reference_file.txt -c 50
+```
+
+#### `-A, --absolute-paths`
+
+Show the absolute path of each result instead of relative paths. Example:
+
+```sh
+findlike reference_file.txt -A
+```
+
+#### `-m, --max-results INTEGER`
+
+Number of items to show in the final results. Default is 10.
+
+```sh
+findlike reference_file.txt -m 5
+```
+
+#### `-p, --prefix TEXT`
+
+String to prepend each entry in the final results. You can set it to "* " or "- " to turn them into a Markdown or Org-mode list. Default is "", so that no prefix is shown. Example: 
+
+```sh
+findlike reference_file.txt -p "- "
+```
+
+#### `-h, --hide-reference`
+
+Remove the first result from the scores list. Useful if the reference file is in the scanned directory, and you don't want to see it included in the top of the results. This option has no effect if the `--query` option is used.
+
+```sh
+findlike reference_file.txt -h
+```
+
+#### `-H, --heading TEXT`
+
+Text to show as the list heading. Default is "", so no heading title is shown. Example:
+
+```sh
+findlike reference_file.txt -H "## Similar files"
+```
+
+#### `-F, --format [plain|json]`
+
+This option sets the output format. `plain` will print the results as a simple list, one entry per line. `json` will print the results as a valid JSON list with `score` and `target` as keys for each entry. Default is "plain". Example:
+
+```sh
+findlike reference_file.txt -F json
+```
+
+#### `-t, --threshold FLOAT`
+
+Similarity score threshold. All results whose score are below the determined threshold will be omitted. Default is 0.05. Set it to 0 if you wish to show all results. Example:
+
+```sh
+findlike reference_file.txt -t 0
+```
+
+## More Examples
 
 To find similar documents in a directory (recursively):
 
@@ -149,7 +233,9 @@ source venv/bin/activate
 
 Now install the development dependencies:
 
+```sh
 pip install -e '.[dev]'
+`` 
 
 To run the tests:
 
@@ -160,3 +246,8 @@ pytest
 ## License
 
 This project is licensed under the terms of the MIT license. See [LICENSE](LICENSE) for more details.
+
+## Acknowledgements
+
+- [Simon Willison](https://simonwillison.net/) for being an inspiration on releasing small but useful tools more often.
+- [Sindre Sorhus](https://raw.githubusercontent.com/sindresorhus/text-extensions) for the comprehensive list of plain-text file extensions.

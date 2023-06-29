@@ -6,16 +6,12 @@ import click
 from nltk.stem import SnowballStemmer
 from stop_words import get_stop_words
 
-from .format import BaseFormatter, JsonFormatter
 from .preprocessing import (
     Corpus,
     Processor,
 )
-from .utils import try_read_file
-from .wrappers import BM25, Tfidf
-
-FORMATTER_CLASSES = {"plain": BaseFormatter, "json": JsonFormatter}
-ALGORITHM_CLASSES = {"bm25": BM25, "tfidf": Tfidf}
+from .utils import try_read_file, collect_paths
+from .constants import FORMATTER_CLASSES, ALGORITHM_CLASSES, TEXT_FILE_EXT
 
 
 @click.command()
@@ -43,7 +39,7 @@ ALGORITHM_CLASSES = {"bm25": BM25, "tfidf": Tfidf}
     type=str,
     default="*.*",
     help="filename pattern matching",
-    show_default=True,
+    show_default="plain-text file extensions",
     required=False,
 )
 @click.option(
@@ -162,7 +158,7 @@ def cli(
     query,
     format,
     threshold,
-    absolute_paths
+    absolute_paths,
 ):
     """'findlike' is a program that scans a given directory and returns the most
     similar documents in relation to REFERENCE_FILE or --query QUERY.
@@ -188,15 +184,12 @@ def cli(
 
     # Put together the list of documents to be analyzed.
     directory_path = Path(directory)
-    glob_func = (
-        directory_path.rglob
-        if recursive
-        else directory_path.glob
+    document_paths = collect_paths(
+        directory=directory_path, extensions=TEXT_FILE_EXT, recursive=recursive
     )
-    documents_paths = [x for x in glob_func(filename_pattern) if x.is_file()]
 
     # Create a corpus with the collected documents.
-    corpus = Corpus(paths=documents_paths, min_chars=min_chars)
+    corpus = Corpus(paths=document_paths, min_chars=min_chars)
 
     # Set up the documents pre-processor.
     stemmer = SnowballStemmer(language).stem
@@ -223,7 +216,7 @@ def cli(
         heading=heading,
         threshold=threshold,
         absolute_paths=absolute_paths,
-        is_query=bool(query)
-        )
+        is_query=bool(query),
+    )
     formatted_results = formatter.format()
     print(formatted_results)
