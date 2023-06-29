@@ -21,19 +21,19 @@ Features:
 
 ## Table of Contents
 
-- [findlike](#findlike)
-  - [Table of Contents](#table-of-contents)
-  - [Prerequisites](#prerequisites)
-  - [Installation](#installation)
-    - [Using `pip` (single user)](#using-pip-single-user)
-    - [Using `pip` and virtual environments](#using-pip-and-virtual-environments)
-    - [Manual installation from source](#manual-installation-from-source)
-  - [Usage](#usage)
-  - [Options](#options)
-  - [Examples](#examples)
-  - [Development](#development)
-  - [License](#license)
-  - [Acknowledgements](#acknowledgements)
+- [Table of Contents](#table-of-contents)
+- [Prerequisites](#prerequisites)
+- [Installation](#installation)
+  - [Using pip (single user)](#using-pip-single-user)
+  - [Using pip and virtual environments](#using-pip-and-virtual-environments)
+  - [Manual installation from source](#manual-installation-from-source)
+- [Usage](#usage)
+- [Options](#options)
+- [Examples](#examples)
+- [Development](#development)
+- [Projects using findlike](#projects-using-findlike)
+- [Acknowledgements](#acknowledgements)
+- [License](#license)
 
 ## Prerequisites
 
@@ -42,7 +42,7 @@ Features:
 
 ## Installation
 
-### Using `pip` (single user)
+### Using pip (single user)
 
 To install `findlike` for your user only, run the following command in your terminal:
 
@@ -50,7 +50,7 @@ To install `findlike` for your user only, run the following command in your term
 pip install --user findlike
 ```
 
-### Using `pip` and virtual environments
+### Using pip and virtual environments
 
 Or, if you wish to install `findlike` in a new virtual environment, first create and activate the environment:
 
@@ -165,11 +165,16 @@ To run the tests:
 pytest
 ```
 
-## License
+## Projects using findlike
 
-This project is licensed under the terms of the MIT license. See [LICENSE](LICENSE) for more details.
+- [org-similarity](https://github.com/brunoarine/org-similarity) - Emacs package to search for similar org files in relation to the current buffer.
 
 ## Acknowledgements
 
 - [Simon Willison](https://simonwillison.net/) for being an inspiration on releasing small but useful tools more often.
 - [Sindre Sorhus](https://raw.githubusercontent.com/sindresorhus/text-extensions) for the comprehensive list of plain-text file extensions.
+
+## License
+
+This project is licensed under the terms of the MIT license. See [LICENSE](LICENSE) for more details.
+
