@@ -21,6 +21,7 @@ Features:
 - [Usage](#usage)
 - [Options](#options)
 - [Example](#examples)
+- [Development](#development)
 - [License](#license)
 
 ## Prerequisites
@@ -134,6 +135,26 @@ To print the results table as a Markdown list:
 
 ```sh
 findlike -H "# List of similar documents" -p "- " reference_file.txt
+```
+
+## Development
+
+To contribute to this tool, first checkout the code. Then create a new virtual environment:
+
+```bash
+cd findlike
+python -m venv venv
+source venv/bin/activate
+```
+
+Now install the development dependencies:
+
+pip install -e '.[dev]'
+
+To run the tests:
+
+```bash
+pytest
 ```
 
 ## License
