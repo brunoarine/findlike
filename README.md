@@ -21,13 +21,19 @@ Features:
 
 ## Table of Contents
 
-- [Prerequisites](#prerequisites)
-- [Installation](#installation)
-- [Usage](#usage)
-- [Options](#options)
-- [Example](#examples)
-- [Development](#development)
-- [License](#license)
+- [findlike](#findlike)
+  - [Table of Contents](#table-of-contents)
+  - [Prerequisites](#prerequisites)
+  - [Installation](#installation)
+    - [Using `pip` (single user)](#using-pip-single-user)
+    - [Using `pip` and virtual environments](#using-pip-and-virtual-environments)
+    - [Manual installation from source](#manual-installation-from-source)
+  - [Usage](#usage)
+  - [Options](#options)
+  - [Examples](#examples)
+  - [Development](#development)
+  - [License](#license)
+  - [Acknowledgements](#acknowledgements)
 
 ## Prerequisites
 
@@ -90,127 +96,30 @@ findlike [OPTIONS] [REFERENCE_FILE]
 
 ## Options
 
-Here's the breakdown of the available options in findlike:
+Here's the breakdown of the available options:
 
-#### `--help`
 
-Displays a short summary of the available options.
-
-#### `-d, --directory PATH`
-
-Specify the directory that is going to be scanned. Default is current working directory. Example:
-
-```sh
-findlike -d /path/to/another/directory
-```
-
-#### `-q, --query TEXT`
-
-Passes an ad-hoc query to the program, so that no reference file is required. Useful when you want to quickly find documents by an overall theme. Example:
-
-```sh
-findlike -q "earthquakes"
-```
-
-#### `-f, --file-pattern`
-
-Specifies the file pattern to use when scanning the directories for similar files. The pattern uses [glob](https://en.wikipedia.org/wiki/Glob_(programming)) convention, and should be passed with single or double quotes, otherwise your shell environment will likely try to expand it. Default is common plain-text file extensions (the full list can be seen [here](./findlike/constants.py)).
-
-```sh
-findlike -f "*.md" reference_file.txt
-```
-
-#### `-R, --recursive`
-
-If used, this option makes `findlike` scans directories and their sub-directories as well. Example:
-
-```sh
-findlike reference_file.txt -R
-```
-
-#### `-a, --algorithm [tfidf|bm25]`
-
-Algorithm to use when generating the scores list. The possible choices are `tfidf` or `bm25'. Default is `tfidf`, and it works great in most cases. However, `bm25' may be a bit more robust in depending on the size of your documents. Example:
-
-```sh
-findlike reference_file -a bm25
-```
-
-#### `-l, --language TEXT`
-
-Changing this value will impact stopwords filtering and word stemmer. The following languages are supported: Arabic, Danish, Dutch, English, Finnish, French, German, Hungarian, Italian, Norwegian, Portuguese, Romanian, Russian, Spanish and Swedish. Default is English.
-
-```sh
-findlike reference_file.txt -l "portuguese"
-```
-
-#### `-c, --min-chars INTEGER`
-
-Minimum document size (in number of characters) to be included in the corpus. Default is 1. Example:
-
-```sh
-findlike reference_file.txt -c 50
-```
-
-#### `-A, --absolute-paths`
-
-Show the absolute path of each result instead of relative paths. Example:
-
-```sh
-findlike reference_file.txt -A
-```
-
-#### `-m, --max-results INTEGER`
-
-Number of items to show in the final results. Default is 10.
-
-```sh
-findlike reference_file.txt -m 5
-```
-
-#### `-p, --prefix TEXT`
-
-String to prepend each entry in the final results. You can set it to "* " or "- " to turn them into a Markdown or Org-mode list. Default is "", so that no prefix is shown. Example: 
-
-```sh
-findlike reference_file.txt -p "- "
-```
-
-#### `-h, --hide-reference`
-
-Remove the first result from the scores list. Useful if the reference file is in the scanned directory, and you don't want to see it included in the top of the results. This option has no effect if the `--query` option is used.
-
-```sh
-findlike reference_file.txt -h
-```
-
-#### `-H, --heading TEXT`
-
-Text to show as the list heading. Default is "", so no heading title is shown. Example:
-
-```sh
-findlike reference_file.txt -H "## Similar files"
-```
-
-#### `-F, --format [plain|json]`
-
-This option sets the output format. `plain` will print the results as a simple list, one entry per line. `json` will print the results as a valid JSON list with `score` and `target` as keys for each entry. Default is "plain". Example:
-
-```sh
-findlike reference_file.txt -F json
-```
-
-#### `-t, --threshold FLOAT`
-
-Similarity score threshold. All results whose score are below the determined threshold will be omitted. Default is 0.05. Set it to 0 if you wish to show all results. Example:
-
-```sh
-findlike reference_file.txt -t 0
-```
+| Options                     | Detailed Description                                                                                                                                                                                                                                                                                                                  |
+| --------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `--help`                    | Displays a short summary of the available options.                                                                                                                                                                                                                                                                                    |
+| `-d, --directory PATH`      | Specify the directory that is going to be scanned. Default is current working directory. Example: `findlike -d /path/to/another/directory`                                                                                                                                                                                            |
+| `-q, --query TEXT`          | Passes an ad-hoc query to the program, so that no reference file is required. Useful when you want to quickly find documents by an overall theme. Example: `findlike -q "earthquakes"`                                                                                                                                                |
+| `-f, --file-pattern`        | Specifies the file pattern to use when scanning the directories for similar files. The pattern uses glob convention, and should be passed with single or double quotes, otherwise your shell environment will likely try to expand it. Default is common plain-text file extensions. Example: `findlike -f "*.md" reference_file.txt` |
+| `-R, --recursive`           | If used, this option makes `findlike` scan directories and their sub-directories as well. Example: `findlike reference_file.txt -R`                                                                                                                                                                                                   |
+| `-a, --algorithm [tfidf     | bm25]`                                                                                                                                                                                                                                                                                                                                | Algorithm to use when generating the scores list. The possible choices are `tfidf` or `bm25`. Default is `tfidf`. Example: `findlike reference_file -a bm25` |
+| `-l, --language TEXT`       | Changing this value will impact stopwords filtering and word stemmer. Default is English. Example: `findlike reference_file.txt -l "portuguese"`                                                                                                                                                                                      |
+| `-c, --min-chars INTEGER`   | Minimum document size (in number of characters) to be included in the corpus. Default is 1. Example: `findlike reference_file.txt -c 50`                                                                                                                                                                                              |
+| `-A, --absolute-paths`      | Show the absolute path of each result instead of relative paths. Example: `findlike reference_file.txt -A`                                                                                                                                                                                                                            |
+| `-m, --max-results INTEGER` | Number of items to show in the final results. Default is 10. Example: `findlike reference_file.txt -m 5`                                                                                                                                                                                                                              |
+| `-p, --prefix TEXT`         | String to prepend each entry in the final results. Default is "". Example: `findlike reference_file.txt -p "- "`                                                                                                                                                                                                                      |
+| `-h, --hide-reference`      | Remove the first result from the scores list. This option has no effect if the `--query` option is used. Example: `findlike reference_file.txt -h`                                                                                                                                                                                    |
+| `-H, --heading TEXT`        | Text to show as the list heading. Default is "". Example: `findlike reference_file.txt -H "## Similar files"`                                                                                                                                                                                                                         |
+| `-F, --format [plain        | json]`                                                                                                                                                                                                                                                                                                                                | This option sets the output format. Default is "plain". Example: `findlike reference_file.txt -F json`                                                       |
+| `-t, --threshold FLOAT`     | Similarity score threshold. All results whose score are below the determined threshold will be omitted. Default is 0.05. Example: `findlike reference_file.txt -t 0`                                                                                                                                                                  |
 
 ## Examples
 
-To find similar documents in a directory (recursively):
+To find similar documents in a directory (recursively) against a reference text file:
 
 ```sh
 findlike -R -d /path/to/directory reference_file.md 
@@ -222,13 +131,13 @@ To search files using a query instead of a reference file while filtering by ext
 findlike -q "black holes" -d /path/to/ayreon/lyrics -f "*.txt"
 ```
 
-To show similarity scores and filenames in JSON format:
+To find similar files and show their similarity scores and filenames in JSON format:
 
 ```sh
 findlike -s -F json reference_file.md
 ```
 
-To print the results table as a Markdown list:
+To print the similarity results as a Markdown list:
 
 ```sh
 findlike -H "# List of similar documents" -p "- " reference_file.txt
