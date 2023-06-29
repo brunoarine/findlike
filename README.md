@@ -4,15 +4,20 @@
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](https://github.com/brunoarine/findlike/blob/master/LICENSE)
 [![Tests](https://github.com/brunoarine/findlike/workflows/Test/badge.svg)](https://github.com/brunoarine/findlike/actions?query=workflow%3ATest)
 
-`findlike` is a command-line tool written in Python that retrieves a list of similar files in relation to a reference file or an ad-hoc query. The tool is highly configurable and can be used as backend for other programs (e.g. personal knowledge management systems, Emacs, etc.) 
+`findlike` is a command-line tool written in Python that retrieves a list of similar files in relation to a reference text or ad-hoc query.
+
+Imagine you have a document, and you want to find other documents on your computer that talk about similar things. You can use `findlike` to do that. It looks at the words and phrases used in your reference document or a specific question you have, and then finds other files that use similar language. It's a bit like doing a Google search across your own files.
+
+![](example.gif)
 
 Features: 
 
-- Choose between BM25 and TF-IDF + cosine distance for similarity calculation
+- Choose between [Okapi BM25](https://en.wikipedia.org/wiki/Okapi_BM25) and [TF-IDF](https://en.wikipedia.org/wiki/Tf%E2%80%93idf) algorithms for the lexical similarity calculation between file contents
 - Recursive search option
 - Control over parameters like maximum number of results, whether to display similarity scores etc.
 - Optionally return results in JSON format
 - Multilingual support
+- Highly configurable and can be used as backend for other programs (e.g. personal knowledge management systems, Emacs, etc.)
 
 ## Table of Contents
 
@@ -203,7 +208,7 @@ Similarity score threshold. All results whose score are below the determined thr
 findlike reference_file.txt -t 0
 ```
 
-## More Examples
+## Examples
 
 To find similar documents in a directory (recursively):
 
