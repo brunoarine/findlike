@@ -34,7 +34,7 @@ def collect_paths(
     """
     glob_func = directory.rglob if recursive else directory.glob
     paths = [
-        x for ext in extensions for x in glob_func("*." + ext) if x.is_file()
+        x for ext in extensions for x in glob_func(ext) if x.is_file()
     ]
     return paths
 

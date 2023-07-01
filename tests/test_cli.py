@@ -36,9 +36,20 @@ def create_directory(tmp_path):
         file.write_text(candidate)
     return str(tmp_path)
 
+
+@pytest.fixture
+def create_directory_with_non_text(tmp_path):
+    for i, candidate in enumerate(candidates):
+        file = tmp_path / f"file_{i:02d}.000"
+        file.write_text(candidate)
+    return str(tmp_path)
+
+
 @pytest.mark.parametrize("format", cli.FORMATTER_CLASSES.keys())
 def test_formats(runner, create_directory, format):
-    result = runner.invoke(cli.cli, ["-d", create_directory, "-F", format, *std_args])
+    result = runner.invoke(
+        cli.cli, ["-d", create_directory, "-F", format, *std_args]
+    )
     assert result.exit_code == 0
 
     json_data = json.loads(result.output.strip())
@@ -47,8 +58,19 @@ def test_formats(runner, create_directory, format):
 
 @pytest.mark.parametrize("algorithm", cli.ALGORITHM_CLASSES.keys())
 def test_algorithms(runner, create_directory, algorithm):
-    result = runner.invoke(cli.cli, ["-d", create_directory, "-a", algorithm, *std_args])
+    result = runner.invoke(
+        cli.cli, ["-d", create_directory, "-a", algorithm, *std_args]
+    )
     json_data = json.loads(result.output.strip())
 
     output_scores = [float(x["score"]) for x in json_data]
     assert spearmanr(output_scores, scores)[0] > 0.99
+
+
+def test_other_extensions(runner, create_directory_with_non_text):
+    result = runner.invoke(
+        cli.cli,
+        ["-d", create_directory_with_non_text, "-f", "*.000", *std_args],
+    )
+    assert "000" in result.output.strip()
+

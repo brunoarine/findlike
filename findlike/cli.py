@@ -37,7 +37,7 @@ from .constants import FORMATTER_CLASSES, ALGORITHM_CLASSES, TEXT_FILE_EXT
     "--filename-pattern",
     "-f",
     type=str,
-    default="*.*",
+    default=None,
     help="filename pattern matching",
     show_default="plain-text file extensions",
     required=False,
@@ -184,8 +184,9 @@ def cli(
 
     # Put together the list of documents to be analyzed.
     directory_path = Path(directory)
+    extensions: list[str] = [filename_pattern] if filename_pattern else TEXT_FILE_EXT
     document_paths = collect_paths(
-        directory=directory_path, extensions=TEXT_FILE_EXT, recursive=recursive
+        directory=directory_path, extensions=extensions, recursive=recursive
     )
 
     # Create a corpus with the collected documents.
