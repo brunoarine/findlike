@@ -191,6 +191,7 @@ def cli(
 
     # Create a corpus with the collected documents.
     corpus = Corpus(paths=document_paths, min_chars=min_chars)
+    corpus.add_document(document=reference_content)
 
     # Set up the documents pre-processor.
     stemmer = SnowballStemmer(language).stem
@@ -198,12 +199,10 @@ def cli(
         stopwords=get_stop_words(language=language),
         stemmer=stemmer,
     )
-
+    
     # Set up the similarity model.
     model = ALGORITHM_CLASSES[algorithm](processor=processor)
-    model.fit(
-        corpus.documents_ + [reference_content]
-    )  # Add reference to avoid zero division
+    model.fit(corpus.documents_)  # Add reference to avoid zero division
     scores = model.get_scores(source=reference_content)
 
     # Format and print results.

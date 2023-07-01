@@ -70,4 +70,3 @@ def test_empty_paths_list():
     corpus = Corpus([], min_chars=0)
     assert len(corpus.documents_) == 0
     assert len(corpus.paths_) == 0
-

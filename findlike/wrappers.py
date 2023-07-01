@@ -10,6 +10,10 @@ class Tfidf:
 
     Args:
         processor (Processor): Processor object.
+
+    Attributes:
+        source_embeddings_: Reference content embeddings.
+        target_embeddings_: Scanned files embeddings.
     """
 
     def __init__(self, processor, **kwargs):
@@ -23,13 +27,14 @@ class Tfidf:
         )
 
     def fit(self, documents: list[str]):
-        self._vectorizer.fit(documents)
-        self.documents_embeddings_ = self._vectorizer.transform(documents)
+        self.target_embeddings_ = self._vectorizer.fit_transform(documents)
 
     def get_scores(self, source: str):
-        self.source_embeddings_ = self._vectorizer.transform([source])
+        # Since the reference has been appended to the corpus, the last
+        # item in the embeddings list will be the reference's.
+        self.reference_embeddings_ = self.target_embeddings_[-1]
         scores = cosine_similarity(
-            self.source_embeddings_, self.documents_embeddings_
+            self.reference_embeddings_, self.target_embeddings_
         ).flatten()
         return scores
 
@@ -39,6 +44,9 @@ class BM25:
 
     Args:
         processor (Processor): Processor object.
+
+    Attributes:
+        tokenized_documents_ (list[str]): List of tokens.
     """
 
     def __init__(self, processor):
@@ -47,11 +55,14 @@ class BM25:
     def fit(self, documents: list[str]):
         """Fit IDF to documents X"""
         clean_docs = [self.processor.preprocessor(d) for d in documents]
-        tokenized_docs = [self.processor.tokenizer(d) for d in clean_docs]
-        self._model = BM25Okapi(tokenized_docs)
+        self.tokenized_documents_ = [
+            self.processor.tokenizer(d) for d in clean_docs
+        ]
+        self._model = BM25Okapi(self.tokenized_documents_)
 
     def get_scores(self, source: str):
-        clean_source = self.processor.preprocessor(source)
-        tokenized_source = self.processor.tokenizer(clean_source)
+        # Since the reference has been appended to the corpus, the last
+        # item in the embeddings list will be the reference's.
+        tokenized_source = self.tokenized_documents_[-1]
         scores = self._model.get_scores(tokenized_source)
         return scores

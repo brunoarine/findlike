@@ -45,8 +45,8 @@ class Processor:
         This method should be called by the similarity algorithms.
         """
         tokens = self._tokenize(text)
-        tokens = self._stemmize(tokens)
-        return tokens
+        stemmized_tokens = self._stemmize(tokens)
+        return stemmized_tokens
 
     def _tokenize(self, text: str) -> list[str]:
         """Preprocess a text and returns a list of tokens.
@@ -91,6 +91,18 @@ class Corpus:
             self._apply_min_chars_filter()
         self._prune_documents()
         self._prune_paths()
+
+    def add_document(self, document: str|None):
+        """Add a document to the current corpus.
+
+        Args:
+            document (str): Document to be added.
+
+        Returns:
+            list[str]: The new corpus after the document has been added.
+        """
+        if document:
+            self.documents_.append(document)
 
     def _load_documents(self):
         self._loaded_documents = [try_read_file(p) for p in self.paths]
