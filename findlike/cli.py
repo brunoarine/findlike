@@ -8,7 +8,7 @@ from stop_words import get_stop_words
 
 from .preprocessing import (
     Corpus,
-    Processor,
+    WordProcessor,
 )
 from .utils import try_read_file, collect_paths
 from .constants import FORMATTER_CLASSES, ALGORITHM_CLASSES, TEXT_FILE_EXT
@@ -195,7 +195,7 @@ def cli(
 
     # Set up the documents pre-processor.
     stemmer = SnowballStemmer(language).stem
-    processor = Processor(
+    processor = WordProcessor(
         stopwords=get_stop_words(language=language),
         stemmer=stemmer,
     )

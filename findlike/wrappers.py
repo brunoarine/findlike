@@ -3,7 +3,7 @@ from __future__ import annotations
 from rank_bm25 import BM25Okapi
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
-
+from nltk.tokenize import sent_tokenize
 
 class Tfidf:
     """Scikit-learn's TF-IDF wrapper.
@@ -66,3 +66,8 @@ class BM25:
         tokenized_source = self.tokenized_documents_[-1]
         scores = self._model.get_scores(tokenized_source)
         return scores
+
+class SBERT:
+    def __init__(self, processor):
+        pass
+    

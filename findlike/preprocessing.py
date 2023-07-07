@@ -1,10 +1,13 @@
 from __future__ import annotations
 
 import re
+from abc import ABC, abstractmethod
 from pathlib import Path
 from typing import Callable
 
-from .utils import try_read_file, compress
+from nltk.tokenize import sent_tokenize
+from pysbd import Segmenter
+from .utils import compress, try_read_file
 
 WORD_RE = re.compile(r"(?u)\b\w{2,}\b")
 URL_RE = re.compile(r"\S*https?:\S*")
@@ -12,7 +15,21 @@ URL_RE = re.compile(r"\S*https?:\S*")
 SCRIPT_PATH = Path(__file__).parent
 
 
-class Processor:
+class Processor(ABC):
+    def __init__(self, **kwargs):
+        pass
+
+    @abstractmethod
+    def tokenizer(self, text: str) -> list[str]:
+        pass
+
+    @abstractmethod
+    def preprocessor(self, text: str) -> str:
+        """Remove fancy symbols and stopwords."""
+        pass
+
+
+class WordProcessor:
     """Class containing preprocessing and tokenization rules.
 
     Args:
@@ -58,6 +75,23 @@ class Processor:
     def _stemmize(self, tokens: list[str]) -> list[str]:
         """Get only the stems from a list of words."""
         return [self.stemmer(w) for w in tokens]
+
+
+class SentenceProcessor:
+    def __init__(self):
+        pass
+
+    def tokenizer(self, text: str) -> list[str]:
+        """Sentence tokenizer."""
+        seg = Segmenter(language="en", clean=False)
+        sentences = seg.segment(text)
+        # Bug in Segmenter's parser that leaves a trailing whitespace.
+        stripped_sentences = [x.strip() for x in sentences]
+        return stripped_sentences
+
+    def preprocessor(self, text: str) -> str:
+        """Passthrough preprocessor."""
+        return text
 
 
 class Corpus:

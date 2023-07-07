@@ -1,13 +1,13 @@
 import pytest
 from nltk.stem import SnowballStemmer
-from findlike.preprocessing import Processor
+from findlike.preprocessing import WordProcessor
 from stop_words import get_stop_words
 
 
 @pytest.fixture
 def processor():
     stemmer = SnowballStemmer("english").stem
-    return Processor(
+    return WordProcessor(
         stopwords=get_stop_words("english"), stemmer=stemmer
     )
 
