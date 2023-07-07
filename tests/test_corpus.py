@@ -33,7 +33,7 @@ def test_loading_documents(sample_paths):
 
 def test_min_chars_filter(sample_paths):
     corpus = Corpus(sample_paths, min_chars=30)
-    filtered_docs = corpus.documents_
+    filtered_docs = corpus._notnull_documents
     filtered_paths = corpus.paths_
 
     assert len(filtered_docs) == 2
@@ -42,7 +42,7 @@ def test_min_chars_filter(sample_paths):
 
 def test_pruning_documents(sample_paths):
     corpus = Corpus(sample_paths, min_chars=30)
-    assert all(doc is not None for doc in corpus.documents_)
+    assert all(doc is not None for doc in corpus._notnull_documents)
 
 
 def test_pruning_paths(sample_paths):
@@ -68,5 +68,5 @@ def test_try_read_file(sample_paths):
 
 def test_empty_paths_list():
     corpus = Corpus([], min_chars=0)
-    assert len(corpus.documents_) == 0
+    assert len(corpus._notnull_documents) == 0
     assert len(corpus.paths_) == 0

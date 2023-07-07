@@ -4,7 +4,8 @@ import re
 from pathlib import Path
 from typing import Callable
 
-from .utils import try_read_file, compress
+from .markup import Markup
+from .utils import compress, try_read_file
 
 WORD_RE = re.compile(r"(?u)\b\w{2,}\b")
 URL_RE = re.compile(r"\S*https?:\S*")
@@ -77,46 +78,74 @@ class Corpus:
         self,
         paths: list[Path],
         min_chars: int,
+        ignore_front_matter: bool = False,
     ):
         self.paths = paths
         self.min_chars = min_chars
+        self.ignore_front_matter = ignore_front_matter
+        
+        self.documents_ = self._notnull_documents
 
-        self._loaded_documents: list[str | None]
-
-        self.documents_: list[str]
-        self.paths_: list[Path]
-
-        self._load_documents()
-        if min_chars:
-            self._apply_min_chars_filter()
-        self._prune_documents()
-        self._prune_paths()
-
-    def add_document(self, document: str|None):
+    def add_document(self, document: str, extension: str | None = None):
         """Add a document to the current corpus.
 
         Args:
             document (str): Document to be added.
+            filetype (str|None): Type or file extension from where the document came.
+                This is necessary in case we try to filter out the document's
+                front-matter.
 
         Returns:
             list[str]: The new corpus after the document has been added.
         """
-        if document:
+        if extension and self.ignore_front_matter:
+            markup = Markup(extension=extension)
+            self.documents_.append(markup.strip_frontmatter(document))
+        else:
             self.documents_.append(document)
 
-    def _load_documents(self):
-        self._loaded_documents = [try_read_file(p) for p in self.paths]
+    @property
+    def _loaded_documents(self) -> list[str | None]:
+        return [try_read_file(p) for p in self.paths]
 
-    def _prune_paths(self):
-        self.paths_ = compress(self.paths, self.documents_)
+    @property
+    def _frontmatter_stripped_documents(self) -> list[str | None]:
+        """Reads _loaded_documents and returns frontmatter-stripped documents"""
+        if self.ignore_front_matter:
+            stripped_documents: list[str | None] = []
+            for document, path in zip(self._loaded_documents, self.paths):
+                if document:
+                    markup = Markup(extension=path.suffix)
+                    stripped_documents.append(
+                        markup.strip_frontmatter(document)
+                    )
+                else:
+                    stripped_documents.append(None)
+            return stripped_documents
+        else:
+            return self._loaded_documents
 
-    def _prune_documents(self):
-        self.documents_ = [x for x in self._loaded_documents if x]
+    @property
+    def _min_filtered_documents(self) -> list[str | None]:
+        """Apply min chars filter in both documents and documents paths.
 
-    def _apply_min_chars_filter(self):
-        """Apply min chars filter in both documents and documents paths"""
-        self._loaded_documents = [
-            doc if doc and len(doc) >= self.min_chars else None
-            for doc in self._loaded_documents
-        ]
-        return self
+        All documents that don't meet the criteria will be turned into None."""
+        if self.min_chars:
+            return [
+                doc if doc and len(doc) >= self.min_chars else None
+                for doc in self._frontmatter_stripped_documents
+            ]
+        else:
+            return self._frontmatter_stripped_documents
+
+    @property
+    def paths_(self) -> list[Path]:
+        """List of paths whose documents are valid
+
+        (i.e. non-null and above max char if set)"""
+        return compress(self.paths, self._min_filtered_documents)
+
+    @property
+    def _notnull_documents(self) -> list[str]:
+        """List of non-null documents"""
+        return [x for x in self._min_filtered_documents if x]
