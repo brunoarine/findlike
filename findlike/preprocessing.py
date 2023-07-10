@@ -60,7 +60,6 @@ class Processor:
         """Get only the stems from a list of words."""
         return [self.stemmer(w) for w in tokens]
 
-
 class Corpus:
     """This wrapper provides easy access to a filtered corpus.
 
@@ -83,69 +82,47 @@ class Corpus:
         self.paths = paths
         self.min_chars = min_chars
         self.ignore_front_matter = ignore_front_matter
-        
-        self.documents_ = self._notnull_documents
 
-    def add_document(self, document: str, extension: str | None = None):
-        """Add a document to the current corpus.
+        self.documents_: list[str] = []
+        self.paths_: list[Path] = []
+        self.reference_: str| None = None
+
+        self.add_from_paths()
+
+    def add_from_file(self, path: Path, is_reference: bool = False):
+        """Adds the contents of a file to the corpus.
 
         Args:
-            document (str): Document to be added.
-            filetype (str|None): Type or file extension from where the document came.
-                This is necessary in case we try to filter out the document's
-                front-matter.
+            path (Path): The path to the file.
+            is_reference (bool, optional): Indicates if the file is a reference file. 
+                Defaults to False.
 
-        Returns:
-            list[str]: The new corpus after the document has been added.
+        Notes:
+            - The file content is added to the corpus if it meets the minimum character 
+              length requirement.
+            - If front matter stripping is enabled, the file content is stripped of its 
+              front matter before being added to the corpus.
         """
-        if extension and self.ignore_front_matter:
-            markup = Markup(extension=extension)
-            self.documents_.append(markup.strip_frontmatter(document))
-        else:
-            self.documents_.append(document)
+        loaded_doc = try_read_file(path)
+        if loaded_doc and len(loaded_doc) >= self.min_chars:
+            if self.ignore_front_matter:
+                loaded_doc = self.strip_front_matter(
+                    loaded_doc, extension=path.suffix
+                )
+            self.documents_.append(loaded_doc)
+            if is_reference:
+                self.reference_ = loaded_doc
+            else:
+                self.paths_.append(path)
 
-    @property
-    def _loaded_documents(self) -> list[str | None]:
-        return [try_read_file(p) for p in self.paths]
+    def add_from_query(self, query: str):
+        self.documents_.append(query)
 
-    @property
-    def _frontmatter_stripped_documents(self) -> list[str | None]:
-        """Reads _loaded_documents and returns frontmatter-stripped documents"""
-        if self.ignore_front_matter:
-            stripped_documents: list[str | None] = []
-            for document, path in zip(self._loaded_documents, self.paths):
-                if document:
-                    markup = Markup(extension=path.suffix)
-                    stripped_documents.append(
-                        markup.strip_frontmatter(document)
-                    )
-                else:
-                    stripped_documents.append(None)
-            return stripped_documents
-        else:
-            return self._loaded_documents
+    def add_from_paths(self) -> list[str | None]:
+        """Load document contents from the specified paths."""
+        return [self.add_from_file(p) for p in self.paths]
 
-    @property
-    def _min_filtered_documents(self) -> list[str | None]:
-        """Apply min chars filter in both documents and documents paths.
-
-        All documents that don't meet the criteria will be turned into None."""
-        if self.min_chars:
-            return [
-                doc if doc and len(doc) >= self.min_chars else None
-                for doc in self._frontmatter_stripped_documents
-            ]
-        else:
-            return self._frontmatter_stripped_documents
-
-    @property
-    def paths_(self) -> list[Path]:
-        """List of paths whose documents are valid
-
-        (i.e. non-null and above max char if set)"""
-        return compress(self.paths, self._min_filtered_documents)
-
-    @property
-    def _notnull_documents(self) -> list[str]:
-        """List of non-null documents"""
-        return [x for x in self._min_filtered_documents if x]
+    def strip_front_matter(self, document: str, extension: str) -> str:
+        """Strip front-matter from the loaded documents."""
+        markup = Markup(extension=extension)
+        return markup.strip_frontmatter(document)

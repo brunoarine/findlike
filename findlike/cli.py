@@ -6,12 +6,12 @@ import click
 from nltk.stem import SnowballStemmer
 from stop_words import get_stop_words
 
+from .constants import ALGORITHM_CLASSES, FORMATTER_CLASSES, TEXT_FILE_EXT
 from .preprocessing import (
     Corpus,
     Processor,
 )
-from .utils import try_read_file, collect_paths
-from .constants import FORMATTER_CLASSES, ALGORITHM_CLASSES, TEXT_FILE_EXT
+from .utils import collect_paths
 
 
 @click.command()
@@ -180,18 +180,6 @@ def cli(
     $ findlike -q "There is only one good, knowledge, and one evil, ignorance"
     """
 
-    # Set up the reference text.
-    if reference_file:
-        reference_content = try_read_file(Path(reference_file))
-        reference_extension = Path(reference_file).suffix
-    elif query:
-        reference_content = query
-        reference_extension = None
-    else:
-        raise click.UsageError(
-            "Neither REFERENCE_FILE nor --query QUERY was provided."
-        )
-
     # Put together the list of documents to be analyzed.
     directory_path = Path(directory)
     extensions: list[str] = (
@@ -207,8 +195,14 @@ def cli(
         min_chars=min_chars,
         ignore_front_matter=ignore_front_matter,
     )
-    if reference_content:
-        corpus.add_document(document=reference_content, extension=reference_extension)
+    if reference_file:
+        corpus.add_from_file(path=Path(reference_file), is_reference=True)
+    elif query:
+        corpus.add_from_query(query=query)
+    else:
+        raise click.UsageError(
+            "Neither REFERENCE_FILE nor --query QUERY was provided."
+        )
 
     # Set up the documents pre-processor.
     stemmer = SnowballStemmer(language).stem
@@ -220,7 +214,7 @@ def cli(
     # Set up the similarity model.
     model = ALGORITHM_CLASSES[algorithm](processor=processor)
     model.fit(corpus.documents_)  # Add reference to avoid zero division
-    scores = model.get_scores(source=reference_content)
+    scores = model.get_scores(source=corpus.reference_)
 
     # Format and print results.
     formatter = FORMATTER_CLASSES[format](

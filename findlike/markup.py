@@ -8,7 +8,10 @@ class Markup:
         }
 
     def strip_frontmatter(self, text: str) -> str:
-            return self._MARKUP_EXTENSIONS[self.extension](text)
+            if self.extension in self._MARKUP_EXTENSIONS.keys():
+                return self._MARKUP_EXTENSIONS[self.extension](text)
+            else:
+                return text
 
     def _strip_org_frontmatter(self, content: str) -> str:
         """
