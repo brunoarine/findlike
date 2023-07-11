@@ -5,7 +5,7 @@ from pathlib import Path
 from typing import Callable
 
 from .markup import Markup
-from .utils import compress, try_read_file
+from .utils import try_read_file
 
 WORD_RE = re.compile(r"(?u)\b\w{2,}\b")
 URL_RE = re.compile(r"\S*https?:\S*")
@@ -60,6 +60,7 @@ class Processor:
         """Get only the stems from a list of words."""
         return [self.stemmer(w) for w in tokens]
 
+
 class Corpus:
     """This wrapper provides easy access to a filtered corpus.
 
@@ -85,7 +86,7 @@ class Corpus:
 
         self.documents_: list[str] = []
         self.paths_: list[Path] = []
-        self.reference_: str| None = None
+        self.reference_: str | None = None
 
         self.add_from_paths()
 
@@ -94,13 +95,13 @@ class Corpus:
 
         Args:
             path (Path): The path to the file.
-            is_reference (bool, optional): Indicates if the file is a reference file. 
+            is_reference (bool, optional): Indicates if the file is a reference file.
                 Defaults to False.
 
         Notes:
-            - The file content is added to the corpus if it meets the minimum character 
+            - The file content is added to the corpus if it meets the minimum character
               length requirement.
-            - If front matter stripping is enabled, the file content is stripped of its 
+            - If front matter stripping is enabled, the file content is stripped of its
               front matter before being added to the corpus.
         """
         loaded_doc = try_read_file(path)
@@ -109,14 +110,17 @@ class Corpus:
                 loaded_doc = self.strip_front_matter(
                     loaded_doc, extension=path.suffix
                 )
-            self.documents_.append(loaded_doc)
             if is_reference:
                 self.reference_ = loaded_doc
+                if self.reference_ not in self.documents_:
+                    self.documents_.append(self.reference_)
             else:
+                self.documents_.append(loaded_doc)
                 self.paths_.append(path)
 
     def add_from_query(self, query: str):
         self.documents_.append(query)
+        self.reference_ = query
 
     def add_from_paths(self) -> list[str | None]:
         """Load document contents from the specified paths."""

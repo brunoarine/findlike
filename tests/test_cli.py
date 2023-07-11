@@ -1,9 +1,12 @@
-from click.testing import CliRunner
-import pytest
-from findlike import cli
-import numpy as np
 import json
+from pathlib import Path
+
+import numpy as np
+import pytest
+from click.testing import CliRunner
 from scipy.stats import spearmanr
+
+from findlike import cli
 
 reference = "Hurricane Irene was a long-lived Cape Verde hurricane during the 2005 Atlantic hurricane season. The storm formed near Cape Verde on August 4 and crossed the Atlantic, turning northward around Bermuda before being absorbed by an extratropical cyclone while situated southeast of Newfoundland. Irene proved to be a difficult storm to forecast due to oscillations in strength. After almost dissipating on August 10, Irene peaked as a Category 2 hurricane on August 16. Irene persisted for 14 days as a tropical system, the longest duration of any storm of the 2005 season. It was the ninth named storm and fourth hurricane of the record-breaking season."
 candidates = [
@@ -21,7 +24,7 @@ candidates = [
 ]
 scores = [1.0, 0.9, 0.8, 0.7, 0.6, 0.5, 0.4, 0.3, 0.2, 0.1, 0.0]
 
-std_args = ["--query", reference, "-F", "json", "-s", "-m", len(scores)]
+std_args = ["-F", "json", "-s", "-h", "-m", len(scores)]
 
 
 @pytest.fixture
@@ -34,6 +37,8 @@ def create_directory(tmp_path):
     for i, candidate in enumerate(candidates):
         file = tmp_path / f"file_{i:02d}.txt"
         file.write_text(candidate)
+    reference_file = tmp_path / "reference.txt"
+    reference_file.write_text(reference)
     return str(tmp_path)
 
 
@@ -42,13 +47,17 @@ def create_directory_with_non_text(tmp_path):
     for i, candidate in enumerate(candidates):
         file = tmp_path / f"file_{i:02d}.000"
         file.write_text(candidate)
+    reference_file = tmp_path / "reference.000"
+    reference_file.write_text(reference)
     return str(tmp_path)
 
 
 @pytest.mark.parametrize("format", cli.FORMATTER_CLASSES.keys())
 def test_formats(runner, create_directory, format):
+    reference_path = Path(create_directory) / "reference.txt"
     result = runner.invoke(
-        cli.cli, ["-d", create_directory, "-F", format, *std_args]
+        cli.cli,
+        [str(reference_path), "-d", create_directory, "-F", format, *std_args],
     )
     assert result.exit_code == 0
 
@@ -58,19 +67,57 @@ def test_formats(runner, create_directory, format):
 
 @pytest.mark.parametrize("algorithm", cli.ALGORITHM_CLASSES.keys())
 def test_algorithms(runner, create_directory, algorithm):
+    reference_path = Path(create_directory) / "reference.txt"
     result = runner.invoke(
-        cli.cli, ["-d", create_directory, "-a", algorithm, *std_args]
+        cli.cli,
+        [
+            str(reference_path),
+            "-d",
+            create_directory,
+            "-a",
+            algorithm,
+            *std_args,
+        ],
+    )
+    json_data = json.loads(result.output.strip())
+    pairs = [(item["score"], item["target"]) for item in json_data]
+    sorted_pairs = sorted(pairs, key=lambda x: x[1])[::-1]
+    output_scores = [float(x[0]) for x in sorted_pairs]
+    corr = round(spearmanr(output_scores, scores)[0], 2)
+    assert corr >= 0.95
+
+
+def test_other_extensions(runner, create_directory_with_non_text):
+    reference_path = Path(create_directory_with_non_text) / "reference.000"
+    result = runner.invoke(
+        cli.cli,
+        [
+            str(reference_path),
+            "-d",
+            create_directory_with_non_text,
+            "-f",
+            "*.000",
+            *std_args,
+        ],
+    )
+    assert "000" in result.output.strip()
+
+
+@pytest.mark.parametrize("algorithm", cli.ALGORITHM_CLASSES.keys())
+def test_query(runner, create_directory, algorithm):
+    result = runner.invoke(
+        cli.cli,
+        [
+            "-q",
+            reference,
+            "-d",
+            create_directory,
+            "-a",
+            algorithm,
+            *std_args,
+        ],
     )
     json_data = json.loads(result.output.strip())
 
     output_scores = [float(x["score"]) for x in json_data]
     assert spearmanr(output_scores, scores)[0] > 0.99
-
-
-def test_other_extensions(runner, create_directory_with_non_text):
-    result = runner.invoke(
-        cli.cli,
-        ["-d", create_directory_with_non_text, "-f", "*.000", *std_args],
-    )
-    assert "000" in result.output.strip()
-
