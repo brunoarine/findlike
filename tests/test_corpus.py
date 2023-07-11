@@ -113,3 +113,10 @@ class TestCorpus:
         extension = ".org"
         expected = "This is some text.\n** A heading\nSome more text."
         assert corpus.strip_front_matter(dedent(document), extension) == expected
+    
+    def test_reference_duplicity(self, corpus, temp_files):
+        corpus.add_from_file(temp_files[0])
+        corpus.add_from_file(temp_files[1])
+        corpus.add_from_file(temp_files[0], is_reference=True)
+        duplicates = set([x for x in corpus.documents_ if corpus.documents_.count(x) > 1])
+        assert len(duplicates) == 0
