@@ -4,7 +4,8 @@ import re
 from pathlib import Path
 from typing import Callable
 
-from .utils import try_read_file, compress
+from .markup import Markup
+from .utils import compress, try_read_file
 
 WORD_RE = re.compile(r"(?u)\b\w{2,}\b")
 URL_RE = re.compile(r"\S*https?:\S*")
@@ -59,7 +60,6 @@ class Processor:
         """Get only the stems from a list of words."""
         return [self.stemmer(w) for w in tokens]
 
-
 class Corpus:
     """This wrapper provides easy access to a filtered corpus.
 
@@ -77,46 +77,52 @@ class Corpus:
         self,
         paths: list[Path],
         min_chars: int,
+        ignore_front_matter: bool = False,
     ):
         self.paths = paths
         self.min_chars = min_chars
+        self.ignore_front_matter = ignore_front_matter
 
-        self._loaded_documents: list[str | None]
+        self.documents_: list[str] = []
+        self.paths_: list[Path] = []
+        self.reference_: str| None = None
 
-        self.documents_: list[str]
-        self.paths_: list[Path]
+        self.add_from_paths()
 
-        self._load_documents()
-        if min_chars:
-            self._apply_min_chars_filter()
-        self._prune_documents()
-        self._prune_paths()
-
-    def add_document(self, document: str|None):
-        """Add a document to the current corpus.
+    def add_from_file(self, path: Path, is_reference: bool = False):
+        """Adds the contents of a file to the corpus.
 
         Args:
-            document (str): Document to be added.
+            path (Path): The path to the file.
+            is_reference (bool, optional): Indicates if the file is a reference file. 
+                Defaults to False.
 
-        Returns:
-            list[str]: The new corpus after the document has been added.
+        Notes:
+            - The file content is added to the corpus if it meets the minimum character 
+              length requirement.
+            - If front matter stripping is enabled, the file content is stripped of its 
+              front matter before being added to the corpus.
         """
-        if document:
-            self.documents_.append(document)
+        loaded_doc = try_read_file(path)
+        if loaded_doc and len(loaded_doc) >= self.min_chars:
+            if self.ignore_front_matter:
+                loaded_doc = self.strip_front_matter(
+                    loaded_doc, extension=path.suffix
+                )
+            self.documents_.append(loaded_doc)
+            if is_reference:
+                self.reference_ = loaded_doc
+            else:
+                self.paths_.append(path)
 
-    def _load_documents(self):
-        self._loaded_documents = [try_read_file(p) for p in self.paths]
+    def add_from_query(self, query: str):
+        self.documents_.append(query)
 
-    def _prune_paths(self):
-        self.paths_ = compress(self.paths, self.documents_)
+    def add_from_paths(self) -> list[str | None]:
+        """Load document contents from the specified paths."""
+        return [self.add_from_file(p) for p in self.paths]
 
-    def _prune_documents(self):
-        self.documents_ = [x for x in self._loaded_documents if x]
-
-    def _apply_min_chars_filter(self):
-        """Apply min chars filter in both documents and documents paths"""
-        self._loaded_documents = [
-            doc if doc and len(doc) >= self.min_chars else None
-            for doc in self._loaded_documents
-        ]
-        return self
+    def strip_front_matter(self, document: str, extension: str) -> str:
+        """Strip front-matter from the loaded documents."""
+        markup = Markup(extension=extension)
+        return markup.strip_frontmatter(document)

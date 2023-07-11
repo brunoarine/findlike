@@ -116,6 +116,7 @@ Here's the breakdown of the available options:
 | `-H, --heading TEXT`        | Text to show as the list heading. Default is "". Example: `findlike reference_file.txt -H "## Similar files"`                                                                                                                                                                                                                         |
 | `-F, --format [plain, json]` | This option sets the output format. Default is "plain". Example: `findlike reference_file.txt -F json`                                                       |
 | `-t, --threshold FLOAT`     | Similarity score threshold. All results whose score are below the determined threshold will be omitted. Default is 0.05. Example: `findlike reference_file.txt -t 0`                                                                                                                                                                  |
+| `-i, --ignore-front-matter` | Tries to strip the front-matter from markup files like Markdown and Org-mode. |
 
 ## Examples
 

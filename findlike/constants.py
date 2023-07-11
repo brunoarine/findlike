@@ -198,7 +198,7 @@ TEXT_FILE_EXT = [
 	"*.nuspec",
 	"*.nvmrc",
 	"*.ops",
-    "org",
+    "*.org",
 	"*.pas",
 	"*.pasm",
 	"*.patch",
