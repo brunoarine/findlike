@@ -30,9 +30,7 @@ class Tfidf:
         self.target_embeddings_ = self._vectorizer.fit_transform(documents)
 
     def get_scores(self, source: str):
-        # Since the reference has been appended to the corpus, the last
-        # item in the embeddings list will be the reference's.
-        self.reference_embeddings_ = self.target_embeddings_[-1]
+        self.reference_embeddings_ = self._vectorizer.transform([source])
         scores = cosine_similarity(
             self.reference_embeddings_, self.target_embeddings_
         ).flatten()
@@ -61,8 +59,6 @@ class BM25:
         self._model = BM25Okapi(self.tokenized_documents_)
 
     def get_scores(self, source: str):
-        # Since the reference has been appended to the corpus, the last
-        # item in the embeddings list will be the reference's.
-        tokenized_source = self.tokenized_documents_[-1]
+        tokenized_source = self.processor.tokenizer(source)
         scores = self._model.get_scores(tokenized_source)
         return scores
