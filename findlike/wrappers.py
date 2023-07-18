@@ -59,6 +59,7 @@ class BM25:
         self._model = BM25Okapi(self.tokenized_documents_)
 
     def get_scores(self, source: str):
-        tokenized_source = self.processor.tokenizer(source)
+        clean_source = self.processor.preprocessor(source)
+        tokenized_source = self.processor.tokenizer(clean_source)
         scores = self._model.get_scores(tokenized_source)
         return scores
