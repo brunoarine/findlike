@@ -8,4 +8,4 @@ build:
 
 test:
 	@echo "Running tests..."
-	pytest
+	python -m pytest

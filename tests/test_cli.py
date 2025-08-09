@@ -6,7 +6,7 @@ import pytest
 from click.testing import CliRunner
 from scipy.stats import spearmanr
 
-from findlike import cli
+from src.findlike import cli
 
 reference = "Hurricane Irene was a long-lived Cape Verde hurricane during the 2005 Atlantic hurricane season. The storm formed near Cape Verde on August 4 and crossed the Atlantic, turning northward around Bermuda before being absorbed by an extratropical cyclone while situated southeast of Newfoundland. Irene proved to be a difficult storm to forecast due to oscillations in strength. After almost dissipating on August 10, Irene peaked as a Category 2 hurricane on August 16. Irene persisted for 14 days as a tropical system, the longest duration of any storm of the 2005 season. It was the ninth named storm and fourth hurricane of the record-breaking season."
 candidates = [
