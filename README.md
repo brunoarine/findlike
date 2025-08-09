@@ -38,7 +38,7 @@ Features:
 
 ## Prerequisites
 
-- Python 3.11 or higher
+- Python 3.10 or higher
 - Additional dependencies as listed in the `pyproject.txt` file
 
 ## Installation
