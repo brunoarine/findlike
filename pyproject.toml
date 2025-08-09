@@ -1,21 +1,21 @@
 [project]
 name = "findlike"
-version = "1.4.2"
+version = "2.0.0"
 authors = [{ name = "Bruno Arine", email = "bruno.arine@runbox.com" }]
 description = "findlike is a package to retrieve similar documents"
 readme = "README.md"
-requires-python = ">=3.7"
+requires-python = ">=3.9"
 classifiers = [
     "Programming Language :: Python :: 3",
-    "License :: OSI Approved :: MIT License",
     "Operating System :: OS Independent"
 ]
 dependencies = [
-    "nltk ~= 3.8",
-    "numpy ~= 1.21.6",
-    "scikit-learn ~= 1.0.2",
-    "rank-bm25 ~= 0.2.2",
-    "stop-words ~= 2018.7.23"
+    "nltk >= 3.9.1",
+    "numpy ~= 1.26.4",
+    "scikit-learn >= 1.1.0",
+    "rank-bm25 >= 0.2.2",
+    "stop-words >= 2018.7.23",
+    "click >= 8.1.8",
 ]
 
 [project.urls]
@@ -27,19 +27,22 @@ dependencies = [
 findlike = "findlike.cli:cli"
 
 [build-system]
-requires = ["setuptools>=61.0"]
+requires = ["setuptools>=69.0.0"]
 build-backend = "setuptools.build_meta"
+
+[tool.setuptools]
+package-dir = {"" = "src"}
 
 [tool.black]
 line-length = 79
 
-[project.optional-dependencies]
+[dependency-groups]
 dev = [
-    "build ~= 0.10.0",
-    "black ~= 23.3.0",
-    "twine ~= 4.0.2",
-    "pylint ~= 2.17.4",
-    "mypy ~= 1.4.0",
-    "flake8 ~= 5.0.4",
-    "pytest ~= 7.4.0",
+    "build",
+    "black",
+    "twine",
+    "pylint",
+    "mypy",
+    "flake8",
+    "pytest"
 ]

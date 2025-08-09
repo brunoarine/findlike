@@ -21,38 +21,46 @@ Features:
 
 ## Table of Contents
 
-- [Table of Contents](#table-of-contents)
-- [Prerequisites](#prerequisites)
-- [Installation](#installation)
-  - [Using pip (single user)](#using-pip-single-user)
-  - [Using pip and virtual environments](#using-pip-and-virtual-environments)
-  - [Manual installation from source](#manual-installation-from-source)
-- [Usage](#usage)
-- [Options](#options)
-- [Examples](#examples)
-- [Development](#development)
-- [Projects using findlike](#projects-using-findlike)
-- [Acknowledgements](#acknowledgements)
-- [License](#license)
+- [findlike](#findlike)
+  - [Table of Contents](#table-of-contents)
+  - [Prerequisites](#prerequisites)
+  - [Installation](#installation)
+    - [Using uv (recommended)](#using-uv-recommended)
+    - [Using pip and virtual environments](#using-pip-and-virtual-environments)
+    - [Manual installation from source](#manual-installation-from-source)
+  - [Usage](#usage)
+  - [Options](#options)
+  - [Examples](#examples)
+  - [Development](#development)
+  - [Projects using findlike](#projects-using-findlike)
+  - [Acknowledgements](#acknowledgements)
+  - [License](#license)
 
 ## Prerequisites
 
-- Python 3.8 or higher
-- Additional dependencies as listed in the `requirements.txt` file
+- Python 3.10 or higher
+- Additional dependencies as listed in the `pyproject.txt` file
 
 ## Installation
 
-### Using pip (single user)
-
-To install `findlike` for your user only, run the following command in your terminal:
+### Using uv (recommended)
+To install `findlike` system-wide using [uv](https://github.com/astral-sh/uv), run:
 
 ```bash
-pip install --user findlike
+uv tool install findlike
+```
+
+Or to install from source:
+
+```bash
+git clone https://github.com/brunoarine/findlike.git
+cd findlike
+uv tool install -e .
 ```
 
 ### Using pip and virtual environments
 
-Or, if you wish to install `findlike` in a new virtual environment, first create and activate the environment:
+If you wish to install `findlike` with `pip` in a new virtual environment, first create and activate the environment:
 
 ```bash
 python -m venv <virtual environment directory>
@@ -83,6 +91,7 @@ Optionally, you can create an alias for the `findlike` command to be accessible 
 echo "alias findlike='/path/to/findlike/venv/bin/findlike'" >> ~/.bashrc
 source ~/.bashrc
 ```
+
 
 ## Usage
 
@@ -178,4 +187,3 @@ pytest
 ## License
 
 This project is licensed under the terms of the MIT license. See [LICENSE](LICENSE) for more details.
-
