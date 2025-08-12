@@ -7,12 +7,10 @@ from typing import Callable
 from .markup import Markup
 from .utils import try_read_file
 
-WORD_RE = re.compile(r"(?u)\b\w{2,}\b")
-URL_RE = re.compile(r"\S*https?:\S*")
-
 SCRIPT_PATH = Path(__file__).parent
 
 
+# Update this class' docstring, AI!
 class Processor:
     """Class containing preprocessing and tokenization rules.
 
@@ -26,9 +24,13 @@ class Processor:
         self,
         stopwords: list[str],
         stemmer: Callable,
+        word_re: str = r"(?u)\b\w{2,}\b",
+        url_re: str =r"\S*https?:\S*" 
     ):
         self.stopwords = stopwords
         self.stemmer = stemmer
+        self.word_re = word_re
+        self.url_re = url_re
         self._stopwords_re = re.compile(
             r"\b(" + r"|".join(stopwords) + r")\b\s*"
         )
@@ -38,7 +40,7 @@ class Processor:
         text = text.lower()
         text = text.translate({ord("’"): ord("'")})
         text = self._stopwords_re.sub("", text)
-        text = URL_RE.sub("", text)
+        text = self.url_re.sub("", text)
         return text
 
     def tokenizer(self, text: str) -> list[str]:
@@ -53,7 +55,7 @@ class Processor:
         """Preprocess a text and returns a list of tokens.
         This method should be called by the similarity algorithms.
         """
-        words = WORD_RE.findall(text)
+        words = self.word_re.findall(text)
         return words
 
     def _stemmize(self, tokens: list[str]) -> list[str]:
