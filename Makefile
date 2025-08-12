@@ -1,4 +1,4 @@
-.PHONY: build test
+.PHONY: build test lint format
 
 build:
 	@echo "Building Python package..."
@@ -9,3 +9,11 @@ build:
 test:
 	@echo "Running tests..."
 	python -m pytest
+
+lint:
+	@echo "Running lint checks..."
+	ruff check src tests
+
+format:
+	@echo "Formatting code..."
+	ruff format src tests
