@@ -38,11 +38,12 @@ line-length = 79
 
 [dependency-groups]
 dev = [
-    "build",
+    "build", 
     "black",
     "twine",
     "pylint",
     "mypy",
     "flake8",
-    "pytest"
+    "pytest",
+    "ruff"
 ]
