@@ -4,33 +4,27 @@ import json
 from pathlib import Path
 
 
-# Update this class' docstring, AI!
 class BaseFormatter:
-    """Format results in an org-compatible format with links.
+    """Base class for formatting similarity search results.
+
+    This class provides the foundation for formatting the results of a similarity search.
+    It processes a list of target files and their corresponding similarity scores, then
+    formats the output according to the specified options.
 
     Args:
-        input_filename (Path): path to the filename that will be used as
-            reference.
-        target_filenames (Path): Glob containing the path to the documents
-            whose similarity with the input filename will be estimated.
-        scores (array-like): List of similarity scores with the same number of
-            documents in target_filenames plus one (accounting for the
-            input_filename).
-        num_results (int): How many similar entries to list at the end of the buffer.
-        show_scores (bool): Whether to prepend the results with the similarity score.
-        remove_first (bool): Remove first result from the scores list. Useful if
-            the source document is inside the same directory as the target documents,
-            and you don't want to see it included in the list for obvious reasons.
-            Default is False.
-        prefix (str): Prefix to add to each item in the printed list.
-        heading (str): List heading (title).
-        hide_reference (bool): Omit the reference file from the final results.
-        absolute_paths (bool): Show absolute paths instead of relative ones.
-        is_query (bool): Flag whether the formatted results come from a query search.
+        targets (list[Path]): List of paths to the target files.
+        scores (list[float]): List of similarity scores corresponding to the targets.
+        max_results (int, optional): Maximum number of results to display. Defaults to 10.
+        show_scores (bool, optional): Whether to show the similarity scores. Defaults to False.
+        hide_reference (bool, optional): Whether to hide the reference file (if present). Defaults to False.
+        prefix (str, optional): Prefix to prepend to each line of the result. Defaults to "".
+        heading (str, optional): Heading to be displayed at the top of the result. Defaults to "".
+        threshold (float, optional): Minimum similarity score to include a result. Defaults to 0.0.
+        absolute_paths (bool, optional): Whether to show absolute paths. Defaults to False.
+        is_query (bool, optional): Indicates if the search was by a query string (as opposed to a reference file). Defaults to False.
+        precision (int, optional): Number of decimal places to round the scores to. Defaults to 2.
 
-    Returns:
-        Formatted output with the list of most similar documents, sorted in descending
-        order of similarity.
+    The `format` method returns the formatted output string.
     """
 
     def __init__(
