@@ -4,6 +4,7 @@ import json
 from pathlib import Path
 
 
+# Update this class' docstring, AI!
 class BaseFormatter:
     """Format results in an org-compatible format with links.
 
@@ -44,6 +45,7 @@ class BaseFormatter:
         threshold: float = 0.0,
         absolute_paths: bool = False,
         is_query: bool = False,
+        precision: int = 2,
     ):
         self.targets = targets
         self.scores = scores
@@ -55,6 +57,7 @@ class BaseFormatter:
         self.threshold = threshold
         self.absolute_paths = absolute_paths
         self.is_query = is_query
+        self.precision = precision
 
         self._scores_targets: list[tuple[float, Path]]
         self._format_targets()._zip_pairs()._filter_pairs()
@@ -76,6 +79,9 @@ class BaseFormatter:
             x for x in self._scores_targets if x[0] >= self.threshold
         ]
 
+        # Apply precision
+        self._scores_targets = [round(x, self.precision) for x in self._scores_targets]
+
         # Limit number of results, disregarding the first entry if `remove_reference`
         # flag was passed.
         start_pos = int(self.hide_reference and not self.is_query)
@@ -90,7 +96,7 @@ class BaseFormatter:
         return self
 
     def _format_score(self, score):
-        return f"{score:.2f}" + " " if self.show_scores else ""
+        return f"{score}" + " " if self.show_scores else ""
 
     def format(self):
         entries = []
