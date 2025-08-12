@@ -31,8 +31,8 @@ class Processor:
     ):
         self.stopwords = stopwords
         self.stemmer = stemmer
-        self.word_re = word_re
-        self.url_re = url_re
+        self.word_re = re.compile(word_re)
+        self.url_re = re.compile(url_re)
         self._stopwords_re = re.compile(r"\b(" + r"|".join(stopwords) + r")\b\s*")
 
     def preprocessor(self, text: str) -> str:
