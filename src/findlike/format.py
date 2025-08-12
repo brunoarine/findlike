@@ -3,6 +3,7 @@ from __future__ import annotations
 import json
 from pathlib import Path
 
+
 class BaseFormatter:
     """Base class for formatting similarity search results.
 
@@ -25,7 +26,6 @@ class BaseFormatter:
 
     The `format` method returns the formatted output string.
     """
-
 
     def __init__(
         self,
