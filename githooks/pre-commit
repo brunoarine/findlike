@@ -1,0 +1,10 @@
+#!/bin/sh
+
+# Run code formatter
+make format
+
+# Stage any formatting changes
+git add -u
+
+# Run linter and abort commit if linting fails
+make lint || exit 1
