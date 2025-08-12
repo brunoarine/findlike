@@ -10,14 +10,16 @@ from .utils import try_read_file
 SCRIPT_PATH = Path(__file__).parent
 
 
-# Update this class' docstring, AI!
 class Processor:
     """Class containing preprocessing and tokenization rules.
 
     Args:
-        junkchars (list): List of junk characters to be stripped from the text.
-        stopwords (list): List of stopwords to be removed from the text.
-        stemmer (nltk's stemmer): Stemmer provided by the nltk API.
+        stopwords (list[str]): List of stopwords to be removed from the text.
+        stemmer (Callable): Stemmer function that takes a word and returns its stem.
+        word_re (str, optional): Regular expression pattern to extract words from text.
+            Defaults to r"(?u)\b\w{2,}\b".
+        url_re (str, optional): Regular expression pattern to remove URLs from text.
+            Defaults to r"\S*https?:\S*".
     """
 
     def __init__(
