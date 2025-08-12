@@ -27,15 +27,13 @@ class Processor:
         stopwords: list[str],
         stemmer: Callable,
         word_re: str = r"(?u)\b\w{2,}\b",  # \w matches word characters
-        url_re: str =r"\S*https?:\S*" 
+        url_re: str = r"\S*https?:\S*",
     ):
         self.stopwords = stopwords
         self.stemmer = stemmer
         self.word_re = word_re
         self.url_re = url_re
-        self._stopwords_re = re.compile(
-            r"\b(" + r"|".join(stopwords) + r")\b\s*"
-        )
+        self._stopwords_re = re.compile(r"\b(" + r"|".join(stopwords) + r")\b\s*")
 
     def preprocessor(self, text: str) -> str:
         """Remove fancy symbols and stopwords."""
@@ -111,9 +109,7 @@ class Corpus:
         loaded_doc = try_read_file(path)
         if loaded_doc and len(loaded_doc) >= self.min_chars:
             if self.ignore_front_matter:
-                loaded_doc = self.strip_front_matter(
-                    loaded_doc, extension=path.suffix
-                )
+                loaded_doc = self.strip_front_matter(loaded_doc, extension=path.suffix)
             if is_reference:
                 self.reference_ = loaded_doc
                 if self.reference_ not in self.documents_:

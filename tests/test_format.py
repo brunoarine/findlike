@@ -18,9 +18,7 @@ class TestBaseFormatter:
     def test_show_scores(self):
         formatter = BaseFormatter(targets, scores, show_scores=True)
         output = formatter.format()
-        assert all(
-            any(char.isdigit() for char in line) for line in output.split("\n")
-        )
+        assert all(any(char.isdigit() for char in line) for line in output.split("\n"))
 
     def test_hide_reference(self):
         formatter = BaseFormatter(targets, scores, hide_reference=True)
@@ -54,7 +52,7 @@ class TestJsonFormatter:
         formatter = JsonFormatter(targets, scores)
         output = formatter.format()
         try:
-            data = json.loads(output)
+            _ = json.loads(output)
         except json.JSONDecodeError:
             pytest.fail("Output is not valid JSON")
 

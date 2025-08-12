@@ -182,9 +182,7 @@ def cli(
 
     # Put together the list of documents to be analyzed.
     directory_path = Path(directory)
-    extensions: list[str] = (
-        [filename_pattern] if filename_pattern else TEXT_FILE_EXT
-    )
+    extensions: list[str] = [filename_pattern] if filename_pattern else TEXT_FILE_EXT
     document_paths = collect_paths(
         directory=directory_path, extensions=extensions, recursive=recursive
     )
@@ -200,9 +198,7 @@ def cli(
     elif query:
         corpus.add_from_query(query=query)
     else:
-        raise click.UsageError(
-            "Neither REFERENCE_FILE nor --query QUERY was provided."
-        )
+        raise click.UsageError("Neither REFERENCE_FILE nor --query QUERY was provided.")
 
     # Set up the documents pre-processor.
     stemmer = SnowballStemmer(language).stem

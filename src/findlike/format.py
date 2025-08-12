@@ -114,8 +114,6 @@ class JsonFormatter(BaseFormatter):
                 for score, target in self._scores_targets
             ]
         else:
-            entries = [
-                {"target": str(target)} for _, target in self._scores_targets
-            ]
+            entries = [{"target": str(target)} for _, target in self._scores_targets]
         json_data = json.dumps(entries)
         return json_data

@@ -12,7 +12,7 @@ test:
 
 lint:
 	@echo "Running lint checks..."
-	ruff check src tests
+	ruff check --fix src tests
 
 format:
 	@echo "Formatting code..."
