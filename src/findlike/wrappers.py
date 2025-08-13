@@ -8,6 +8,18 @@ from .preprocessing import Processor
 from functools import partial
 
 def _process_doc(doc: str, processor: Processor) -> list[str]:
+    """Apply preprocessing and tokenization to a document.
+
+    This helper function is used in parallel processing to clean and tokenize
+    a document using the provided Processor instance.
+
+    Args:
+        doc: The document text to process.
+        processor: The Processor instance containing preprocessing rules.
+
+    Returns:
+        The tokenized document as a list of strings.
+    """
     cleaned = processor.preprocessor(doc)
     return processor.tokenizer(cleaned)
 
