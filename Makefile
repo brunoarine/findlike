@@ -1,8 +1,10 @@
-.PHONY: build test lint format
+.PHONY: build test lint format upload
 
 build:
 	@echo "Building Python package..."
 	python -m build
+
+upload:
 	@echo "Uploading to PyPI..."
 	python -m twine upload dist/*
 
