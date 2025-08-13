@@ -126,6 +126,9 @@ Here's the breakdown of the available options:
 | `-F, --format [plain, json]` | This option sets the output format. Default is "plain". Example: `findlike reference_file.txt -F json`                                                       |
 | `-t, --threshold FLOAT`     | Similarity score threshold. All results whose score are below the determined threshold will be omitted. Default is 0.05. Example: `findlike reference_file.txt -t 0`                                                                                                                                                                  |
 | `-i, --ignore-front-matter` | Tries to strip the front-matter from markup files like Markdown and Org-mode. |
+| `-P, --precision INTEGER` | Number of decimal places for similarity scores. Default is 2. Example: `findlike reference_file.txt -P 3` |
+| `--word-re TEXT` | Regular expression pattern to extract words from text. Default is `r"(?u)\b\w{2,}\b"`. Example: `findlike reference_file.txt --word-re="\b\w{3,}\b"` |
+| `--url-re TEXT` | Regular expression pattern to remove URLs from text. Default is `r"\S*https?:\S*"`. Example: `findlike reference_file.txt --url-re="http\S*"` |
 
 ## Examples
 
