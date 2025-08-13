@@ -52,6 +52,7 @@ class BM25:
 
     def fit(self, documents: list[str]):
         """Fit IDF to documents X"""
+        # Parallelize this function, AI!
         clean_docs = [self.processor.preprocessor(d) for d in documents]
         self.tokenized_documents_ = [self.processor.tokenizer(d) for d in clean_docs]
         self._model = BM25Okapi(self.tokenized_documents_)
