@@ -1,7 +1,6 @@
 import json
 from pathlib import Path
 
-import numpy as np
 import pytest
 from click.testing import CliRunner
 from scipy.stats import spearmanr

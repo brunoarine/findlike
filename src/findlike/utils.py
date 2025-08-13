@@ -20,7 +20,7 @@ def compress(data: Iterable[Any], selectors: Iterable[Any]) -> list[Any]:
 def collect_paths(
     directory: Path, extensions: list[str], recursive: bool = False
 ) -> list[Path]:
-    """ Collects file paths in a directory that match the given extensions.
+    """Collects file paths in a directory that match the given extensions.
 
     Args:
         directory (Path): The directory to search in.
@@ -33,8 +33,5 @@ def collect_paths(
         list[Path]: A list of paths to the matching files.
     """
     glob_func = directory.rglob if recursive else directory.glob
-    paths = [
-        x for ext in extensions for x in glob_func(ext) if x.is_file()
-    ]
+    paths = [x for ext in extensions for x in glob_func(ext) if x.is_file()]
     return paths
-

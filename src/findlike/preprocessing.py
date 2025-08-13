@@ -7,9 +7,6 @@ from typing import Callable
 from .markup import Markup
 from .utils import try_read_file
 
-WORD_RE = re.compile(r"(?u)\b\w{2,}\b")
-URL_RE = re.compile(r"\S*https?:\S*")
-
 SCRIPT_PATH = Path(__file__).parent
 
 
@@ -17,28 +14,33 @@ class Processor:
     """Class containing preprocessing and tokenization rules.
 
     Args:
-        junkchars (list): List of junk characters to be stripped from the text.
-        stopwords (list): List of stopwords to be removed from the text.
-        stemmer (nltk's stemmer): Stemmer provided by the nltk API.
+        stopwords (list[str]): List of stopwords to be removed from the text.
+        stemmer (Callable): Stemmer function that takes a word and returns its stem.
+        word_re (str, optional): Regular expression pattern to extract words from text.
+            Defaults to r"(?u)\b\w{2,}\b".
+        url_re (str, optional): Regular expression pattern to remove URLs from text.
+            Defaults to r"\S*https?:\S*".
     """
 
     def __init__(
         self,
         stopwords: list[str],
         stemmer: Callable,
+        word_re: str = r"(?u)\b\w{2,}\b",  # \w matches word characters
+        url_re: str = r"\S*https?:\S*",
     ):
         self.stopwords = stopwords
         self.stemmer = stemmer
-        self._stopwords_re = re.compile(
-            r"\b(" + r"|".join(stopwords) + r")\b\s*"
-        )
+        self.word_re = re.compile(word_re)
+        self.url_re = re.compile(url_re)
+        self._stopwords_re = re.compile(r"\b(" + r"|".join(stopwords) + r")\b\s*")
 
     def preprocessor(self, text: str) -> str:
         """Remove fancy symbols and stopwords."""
         text = text.lower()
         text = text.translate({ord("’"): ord("'")})
         text = self._stopwords_re.sub("", text)
-        text = URL_RE.sub("", text)
+        text = self.url_re.sub("", text)
         return text
 
     def tokenizer(self, text: str) -> list[str]:
@@ -53,7 +55,7 @@ class Processor:
         """Preprocess a text and returns a list of tokens.
         This method should be called by the similarity algorithms.
         """
-        words = WORD_RE.findall(text)
+        words = self.word_re.findall(text)
         return words
 
     def _stemmize(self, tokens: list[str]) -> list[str]:
@@ -107,9 +109,7 @@ class Corpus:
         loaded_doc = try_read_file(path)
         if loaded_doc and len(loaded_doc) >= self.min_chars:
             if self.ignore_front_matter:
-                loaded_doc = self.strip_front_matter(
-                    loaded_doc, extension=path.suffix
-                )
+                loaded_doc = self.strip_front_matter(loaded_doc, extension=path.suffix)
             if is_reference:
                 self.reference_ = loaded_doc
                 if self.reference_ not in self.documents_:

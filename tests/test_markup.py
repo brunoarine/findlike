@@ -1,6 +1,7 @@
 from findlike.markup import Markup
 from textwrap import dedent
 
+
 class TestMarkup:
     def test_remove_org_front_matter(self):
         content = """

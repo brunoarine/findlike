@@ -7,9 +7,7 @@ from stop_words import get_stop_words
 @pytest.fixture
 def processor():
     stemmer = SnowballStemmer("english").stem
-    return Processor(
-        stopwords=get_stop_words("english"), stemmer=stemmer
-    )
+    return Processor(stopwords=get_stop_words("english"), stemmer=stemmer)
 
 
 def test_preprocessor(processor):
