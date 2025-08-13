@@ -7,19 +7,7 @@ from sklearn.metrics.pairwise import cosine_similarity
 from .preprocessing import Processor
 from functools import partial
 
-def _process_doc(doc: str, processor: Processor) -> list[str]:
-    """Apply preprocessing and tokenization to a document.
-
-    This helper function is used in parallel processing to clean and tokenize
-    a document using the provided Processor instance.
-
-    Args:
-        doc: The document text to process.
-        processor: The Processor instance containing preprocessing rules.
-
-    Returns:
-        The tokenized document as a list of strings.
-    """
+def _process_doc(processor: Processor, doc: str) -> list[str]:
     cleaned = processor.preprocessor(doc)
     return processor.tokenizer(cleaned)
 
@@ -69,10 +57,9 @@ class BM25:
         self.processor = processor
 
     def fit(self, documents: list[str]):
-        """Fit IDF to documents X"""
-        
+        process_doc = partial(_process_doc, self.processor)
         with concurrent.futures.ThreadPoolExecutor() as executor:
-            self.tokenized_documents_ = list(executor.map(_process_doc, documents))
+            self.tokenized_documents_ = list(executor.map(process_doc, documents))
 
         self._model = BM25Okapi(self.tokenized_documents_)
 
