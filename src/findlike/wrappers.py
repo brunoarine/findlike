@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import concurrent.futures
 from rank_bm25 import BM25Okapi
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
@@ -52,8 +53,13 @@ class BM25:
 
     def fit(self, documents: list[str]):
         """Fit IDF to documents X"""
-        clean_docs = [self.processor.preprocessor(d) for d in documents]
-        self.tokenized_documents_ = [self.processor.tokenizer(d) for d in clean_docs]
+        def _process_doc(doc: str) -> list[str]:
+            cleaned = self.processor.preprocessor(doc)
+            return self.processor.tokenizer(cleaned)
+
+        with concurrent.futures.ThreadPoolExecutor() as executor:
+            self.tokenized_documents_ = list(executor.map(_process_doc, documents))
+
         self._model = BM25Okapi(self.tokenized_documents_)
 
     def get_scores(self, source: str):
