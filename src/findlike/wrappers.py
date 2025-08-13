@@ -4,7 +4,12 @@ import concurrent.futures
 from rank_bm25 import BM25Okapi
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
+from .preprocessing import Processor
+from functools import partial
 
+def _process_doc(doc: str, processor: Processor) -> list[str]:
+    cleaned = processor.preprocessor(doc)
+    return processor.tokenizer(cleaned)
 
 class Tfidf:
     """Scikit-learn's TF-IDF wrapper.
@@ -53,10 +58,7 @@ class BM25:
 
     def fit(self, documents: list[str]):
         """Fit IDF to documents X"""
-        def _process_doc(doc: str) -> list[str]:
-            cleaned = self.processor.preprocessor(doc)
-            return self.processor.tokenizer(cleaned)
-
+        
         with concurrent.futures.ThreadPoolExecutor() as executor:
             self.tokenized_documents_ = list(executor.map(_process_doc, documents))
 
