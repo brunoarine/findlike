@@ -30,15 +30,17 @@
                                                                                                                                                                            
      - name: Build package                                                                                                                                                 
        run: make build
-                                                                                                                                                                           
+
      - name: Publish to PyPI
        uses: pypa/gh-action-pypi-publish@release/v1
                                                                                                                                                                            
      - name: Create GitHub Release                                                                                                                                         
-       uses: softprops/action-gh-release@v1                                                                                                                                
+       uses: softprops/action-gh-release@v2                                                                                                                                
        with:                                                                                                                                                               
-         name: Release ${{ github.ref_name }}                                                                                                                              
-         tag_name: ${{ github.ref }}                                                                                                                                       
+         name: ${{ github.ref_name }}                                                                                                                              
+         tag_name: ${{ github.ref }}
+         draft: false
+         prerelease: false
          body: |                                                                                                                                                           
            Release ${{ github.ref_name }}                                                                                                                                  
            - Built from ${{ github.sha }}                                                                                                                                  
