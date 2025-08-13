@@ -9,7 +9,10 @@
                                                                                                                                                                            
  jobs:                                                                                                                                                                     
    build-and-publish:                                                                                                                                                      
-     runs-on: ubuntu-latest                                                                                                                                                
+     runs-on: ubuntu-latest
+     environment: pypi
+     permissions:
+      id-token: write
                                                                                                                                                                            
      steps:                                                                                                                                                                
      - name: Checkout code                                                                                                                                                 
@@ -28,11 +31,8 @@
      - name: Build package                                                                                                                                                 
        run: make build
                                                                                                                                                                            
-     - name: Publish to PyPI                                                                                                                                               
-       env:                                                                                                                                                                
-         TWINE_USERNAME: __token__                                                                                                                                         
-         TWINE_PASSWORD: ${{ secrets.PYPI_API_TOKEN }}                                                                                                                     
-       run: twine upload dist/*                                                                                                                                            
+     - name: Publish to PyPI
+       uses: pypa/gh-action-pypi-publish@release/v1
                                                                                                                                                                            
      - name: Create GitHub Release                                                                                                                                         
        uses: softprops/action-gh-release@v1                                                                                                                                
