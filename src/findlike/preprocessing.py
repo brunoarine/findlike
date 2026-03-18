@@ -17,9 +17,9 @@ class Processor:
         stopwords (list[str]): List of stopwords to be removed from the text.
         stemmer (Callable): Stemmer function that takes a word and returns its stem.
         word_re (str, optional): Regular expression pattern to extract words from text.
-            Defaults to r"(?u)\b\w{2,}\b".
+            Defaults to r"(?u)\b\\w{2,}\b".
         url_re (str, optional): Regular expression pattern to remove URLs from text.
-            Defaults to r"\S*https?:\S*".
+            Defaults to r"\\S*https?:\\S*".
     """
 
     def __init__(
