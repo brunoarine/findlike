@@ -11,7 +11,7 @@ classifiers = [
 ]
 dependencies = [
     "nltk >= 3.9.1",
-    "numpy ~= 1.26.4",
+    "numpy >= 1.26.4",
     "scikit-learn >= 1.1.0",
     "rank-bm25 >= 0.2.2",
     "stop-words == 2018.7.23",
@@ -35,6 +35,9 @@ package-dir = {"" = "src"}
 
 [tool.black]
 line-length = 79
+
+[tool.ruff.lint]
+select = ["NPY201"]
 
 [dependency-groups]
 dev = [
